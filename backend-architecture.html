@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BCBS Claims AI - Backend Architecture</title>
+<style>
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155; --border: #475569;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8; --accent2: #818cf8;
+    --green: #4ade80; --amber: #fbbf24; --rose: #fb7185; --teal: #2dd4bf;
+    --purple: #a78bfa; --orange: #fb923c; --cyan: #22d3ee;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 0.25rem; background: linear-gradient(135deg, var(--green), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 2.5rem; }
+  .section { margin-bottom: 2.5rem; }
+  .section-title { font-size: 1.05rem; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .section-title::before { content: ''; display: inline-block; width: 4px; height: 1.1em; border-radius: 2px; background: var(--green); }
+
+  .tech-banner { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 2.5rem; }
+  .tech-pill { background: var(--surface); border: 1px solid var(--border); border-radius: 99px; padding: 0.35rem 0.85rem; font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+  .tech-pill strong { color: var(--text); }
+
+  /* Layer diagram */
+  .layers { display: flex; flex-direction: column; gap: 0.5rem; }
+  .layer { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; position: relative; }
+  .layer-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .layer-items { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .layer-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+  .layer-item .li-name { font-weight: 600; }
+  .layer-item .li-file { font-size: 0.65rem; color: var(--muted); font-family: monospace; }
+  .layer-arrow { text-align: center; color: var(--green); font-size: 1.2rem; padding: 0.1rem 0; }
+
+  .b-green { border-left: 3px solid var(--green); }
+  .b-teal { border-left: 3px solid var(--teal); }
+  .b-purple { border-left: 3px solid var(--purple); }
+  .b-amber { border-left: 3px solid var(--amber); }
+  .b-blue { border-left: 3px solid var(--accent); }
+  .b-rose { border-left: 3px solid var(--rose); }
+  .b-orange { border-left: 3px solid var(--orange); }
+
+  /* Cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+  .card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .card p, .card li { font-size: 0.82rem; color: var(--muted); }
+  .card ul { list-style: none; padding-left: 0; }
+  .card ul li { padding: 0.2rem 0; position: relative; padding-left: 1rem; }
+  .card ul li::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  /* Endpoints */
+  .endpoints { display: flex; flex-direction: column; gap: 0.4rem; }
+  .endpoint { display: flex; align-items: center; gap: 0.75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 0.85rem; font-size: 0.82rem; }
+  .method { font-size: 0.65rem; font-weight: 700; padding: 0.15em 0.5em; border-radius: 3px; flex-shrink: 0; min-width: 3em; text-align: center; }
+  .method-get { background: rgba(74,222,128,0.2); color: var(--green); }
+  .method-post { background: rgba(56,189,248,0.2); color: var(--accent); }
+  .path { font-family: monospace; color: var(--text); font-size: 0.8rem; }
+  .desc { color: var(--muted); margin-left: auto; font-size: 0.75rem; }
+
+  /* Agent graph */
+  .graph-flow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: center; }
+  .g-node { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.9rem; text-align: center; min-width: 120px; }
+  .g-node .g-name { font-weight: 600; font-size: 0.85rem; }
+  .g-node .g-desc { font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; }
+  .g-arrow { color: var(--green); font-size: 1.2rem; }
+  .g-branch { display: flex; flex-direction: column; gap: 0.4rem; }
+  .g-option { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.75rem; font-size: 0.78rem; display: flex; align-items: center; gap: 0.4rem; }
+  .tag { font-size: 0.6rem; font-weight: 700; padding: 0.1em 0.4em; border-radius: 3px; }
+  .tag-sql { background: rgba(56,189,248,0.2); color: var(--accent); }
+  .tag-rag { background: rgba(45,212,191,0.2); color: var(--teal); }
+  .tag-clarify { background: rgba(251,191,36,0.2); color: var(--amber); }
+  .tag-fix { background: rgba(251,113,133,0.2); color: var(--rose); }
+
+  /* State */
+  .state-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.5rem; }
+  .state-item { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem; }
+  .state-item .name { font-family: monospace; font-size: 0.78rem; font-weight: 600; color: var(--cyan); }
+  .state-item .stype { font-size: 0.65rem; color: var(--purple); }
+  .state-item .sdesc { font-size: 0.68rem; color: var(--muted); margin-top: 0.1rem; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { text-align: left; padding: 0.6rem 0.75rem; background: var(--surface2); color: var(--text); font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); }
+  td:first-child { color: var(--green); font-weight: 500; }
+  .mono { font-family: monospace; font-size: 0.75rem; }
+
+  .footer { text-align: center; color: var(--muted); font-size: 0.75rem; padding-top: 2rem; border-top: 1px solid var(--border); margin-top: 1rem; }
+  @media (max-width: 700px) { body { padding: 1rem; } .cards { grid-template-columns: 1fr; } .graph-flow { flex-direction: column; } .endpoint .desc { display: none; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Backend Architecture</h1>
+<p class="subtitle">FastAPI + Python 3.12 + LangGraph + DuckDB + UV</p>
+
+<div class="tech-banner">
+  <span class="tech-pill"><strong>FastAPI</strong> Framework</span>
+  <span class="tech-pill"><strong>LangGraph</strong> Agent</span>
+  <span class="tech-pill"><strong>LangChain</strong> LLM</span>
+  <span class="tech-pill"><strong>DuckDB</strong> Analytics</span>
+  <span class="tech-pill"><strong>BM25</strong> / <strong>ChromaDB</strong> RAG</span>
+  <span class="tech-pill"><strong>Pydantic</strong> Models</span>
+  <span class="tech-pill"><strong>UV</strong> Package Mgr</span>
+  <span class="tech-pill"><strong>SSE</strong> Streaming</span>
+</div>
+
+<!-- ───────── Layered Architecture ───────── -->
+<div class="section">
+  <div class="section-title">Layered Architecture</div>
+  <div class="layers">
+    <div class="layer b-blue">
+      <div class="layer-label"><span style="color:var(--accent)">&#9679;</span> HTTP Layer &mdash; Routers</div>
+      <div class="layer-items">
+        <div class="layer-item"><span class="li-name" style="color:var(--accent)">Chat Router</span> <span class="li-file">routers/chat.py</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--accent)">Upload Router</span> <span class="li-file">routers/upload.py</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--accent)">Data Router</span> <span class="li-file">routers/data.py</span></div>
+      </div>
+    </div>
+    <div class="layer-arrow">&darr;</div>
+    <div class="layer b-purple">
+      <div class="layer-label"><span style="color:var(--purple)">&#9679;</span> Agent Layer &mdash; LangGraph</div>
+      <div class="layer-items">
+        <div class="layer-item"><span class="li-name" style="color:var(--purple)">StateGraph</span> <span class="li-file">agent/graph.py</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--purple)">6 Nodes</span> <span class="li-file">agent/nodes.py</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--purple)">AgentState</span> <span class="li-file">agent/state.py</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--purple)">Prompts</span> <span class="li-file">agent/prompts.py</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--purple)">LLM Factory</span> <span class="li-file">agent/llm.py</span></div>
+      </div>
+    </div>
+    <div class="layer-arrow">&darr;</div>
+    <div class="layer b-teal">
+      <div class="layer-label"><span style="color:var(--teal)">&#9679;</span> Service Layer &mdash; Data &amp; Storage</div>
+      <div class="layer-items">
+        <div class="layer-item"><span class="li-name" style="color:var(--teal)">DuckDB</span> <span class="li-file">services/database.py</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--teal)">Storage</span> <span class="li-file">services/storage.py</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--teal)">VectorStore</span> <span class="li-file">services/vectorstore.py</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--teal)">Conversations</span> <span class="li-file">services/conversations.py</span></div>
+      </div>
+    </div>
+    <div class="layer-arrow">&darr;</div>
+    <div class="layer" style="border-style:dashed; border-left:3px solid var(--orange);">
+      <div class="layer-label"><span style="color:var(--orange)">&#9679;</span> External &mdash; Optional</div>
+      <div class="layer-items">
+        <div class="layer-item"><span class="li-name" style="color:var(--orange)">Claude API</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--orange)">AWS Bedrock</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--orange)">S3</span></div>
+        <div class="layer-item"><span class="li-name" style="color:var(--orange)">DynamoDB</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── API Endpoints ───────── -->
+<div class="section">
+  <div class="section-title">API Endpoints</div>
+  <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap:1rem;">
+    <div>
+      <div style="font-size:0.8rem; font-weight:600; color:var(--muted); margin-bottom:0.5rem">Chat Router <span class="mono">/api/chat</span></div>
+      <div class="endpoints">
+        <div class="endpoint"><span class="method method-post">POST</span><span class="path">/stream</span><span class="desc">SSE streaming chat</span></div>
+        <div class="endpoint"><span class="method method-post">POST</span><span class="path">/</span><span class="desc">Non-streaming fallback</span></div>
+        <div class="endpoint"><span class="method method-get">GET</span><span class="path">/history/{id}</span><span class="desc">Conversation history</span></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.8rem; font-weight:600; color:var(--muted); margin-bottom:0.5rem">Upload Router <span class="mono">/api</span></div>
+      <div class="endpoints">
+        <div class="endpoint"><span class="method method-post">POST</span><span class="path">/upload/csv</span><span class="desc">CSV &rarr; Parquet &rarr; DuckDB</span></div>
+        <div class="endpoint"><span class="method method-post">POST</span><span class="path">/upload/pdf</span><span class="desc">PDF &rarr; RAG index</span></div>
+        <div class="endpoint"><span class="method method-get">GET</span><span class="path">/datasets</span><span class="desc">Loaded datasets</span></div>
+        <div class="endpoint"><span class="method method-get">GET</span><span class="path">/documents</span><span class="desc">Indexed documents</span></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.8rem; font-weight:600; color:var(--muted); margin-bottom:0.5rem">Data Router <span class="mono">/api</span></div>
+      <div class="endpoints">
+        <div class="endpoint"><span class="method method-get">GET</span><span class="path">/health</span><span class="desc">Service health check</span></div>
+        <div class="endpoint"><span class="method method-get">GET</span><span class="path">/config</span><span class="desc">Feature flags</span></div>
+        <div class="endpoint"><span class="method method-get">GET</span><span class="path">/schema</span><span class="desc">DuckDB table schemas</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── LangGraph Agent ───────── -->
+<div class="section">
+  <div class="section-title">LangGraph Agent &mdash; StateGraph</div>
+  <div class="graph-flow">
+    <div class="g-node" style="border-color:var(--accent)">
+      <div class="g-name" style="color:var(--accent)">START</div>
+    </div>
+    <div class="g-arrow">&rarr;</div>
+    <div class="g-node">
+      <div class="g-name">classify_intent</div>
+      <div class="g-desc">LLM classifies query type</div>
+    </div>
+    <div class="g-arrow">&rarr;</div>
+    <div class="g-branch">
+      <div class="g-option"><span class="tag tag-sql">NL2SQL</span> generate_sql &rarr; execute_query</div>
+      <div class="g-option"><span class="tag tag-rag">RAG</span> search_documents</div>
+      <div class="g-option"><span class="tag tag-clarify">CLARIFY</span> (direct to synthesize)</div>
+      <div class="g-option"><span class="tag tag-fix">FIX</span> fix_sql &rarr; execute_query (on error)</div>
+    </div>
+    <div class="g-arrow">&rarr;</div>
+    <div class="g-node">
+      <div class="g-name">synthesize</div>
+      <div class="g-desc">Format final answer</div>
+    </div>
+    <div class="g-arrow">&rarr;</div>
+    <div class="g-node" style="border-color:var(--green)">
+      <div class="g-name" style="color:var(--green)">END</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── AgentState ───────── -->
+<div class="section">
+  <div class="section-title">AgentState (TypedDict)</div>
+  <div class="state-grid">
+    <div class="state-item"><div class="name">query</div><div class="stype">str</div><div class="sdesc">User's question</div></div>
+    <div class="state-item"><div class="name">intent</div><div class="stype">str</div><div class="sdesc">nl2sql | rag | clarify</div></div>
+    <div class="state-item"><div class="name">sql</div><div class="stype">str</div><div class="sdesc">Generated SQL query</div></div>
+    <div class="state-item"><div class="name">sql_error</div><div class="stype">str | None</div><div class="sdesc">SQL execution error</div></div>
+    <div class="state-item"><div class="name">sql_retry_count</div><div class="stype">int</div><div class="sdesc">Fix attempts so far</div></div>
+    <div class="state-item"><div class="name">query_results</div><div class="stype">list[dict]</div><div class="sdesc">DuckDB query output</div></div>
+    <div class="state-item"><div class="name">rag_chunks</div><div class="stype">list[dict]</div><div class="sdesc">Retrieved doc chunks</div></div>
+    <div class="state-item"><div class="name">answer</div><div class="stype">str</div><div class="sdesc">Final synthesized text</div></div>
+    <div class="state-item"><div class="name">chart_type</div><div class="stype">str | None</div><div class="sdesc">bar | line | pie</div></div>
+    <div class="state-item"><div class="name">citations</div><div class="stype">list[dict]</div><div class="sdesc">RAG source metadata</div></div>
+    <div class="state-item"><div class="name">metadata</div><div class="stype">dict</div><div class="sdesc">Timing & perf data</div></div>
+    <div class="state-item"><div class="name">conversation_history</div><div class="stype">list[dict]</div><div class="sdesc">Prior messages</div></div>
+  </div>
+</div>
+
+<!-- ───────── 6 Node Functions ───────── -->
+<div class="section">
+  <div class="section-title">Node Functions (6 Nodes)</div>
+  <div class="cards">
+    <div class="card b-blue">
+      <h3><span style="color:var(--accent)">1</span> classify_intent</h3>
+      <ul>
+        <li>Reads DB schema + document list</li>
+        <li>LLM call with CLASSIFY_PROMPT</li>
+        <li>Parses JSON &rarr; intent + reasoning</li>
+        <li>Fallback: "clarify" on error</li>
+      </ul>
+    </div>
+    <div class="card b-purple">
+      <h3><span style="color:var(--purple)">2</span> generate_sql</h3>
+      <ul>
+        <li>Gets schema + 5 sample rows</li>
+        <li>LLM call with SQL_GENERATION_PROMPT</li>
+        <li>Extracts SQL from markdown code blocks</li>
+        <li>DuckDB-compatible SQL rules</li>
+      </ul>
+    </div>
+    <div class="card b-teal">
+      <h3><span style="color:var(--teal)">3</span> execute_query</h3>
+      <ul>
+        <li>Runs SQL against DuckDB in-memory</li>
+        <li>Returns list of dicts</li>
+        <li>On error: sets sql_error + increments retry</li>
+        <li>No exception thrown (captured in state)</li>
+      </ul>
+    </div>
+    <div class="card b-rose">
+      <h3><span style="color:var(--rose)">4</span> fix_sql</h3>
+      <ul>
+        <li>Receives broken SQL + error msg</li>
+        <li>LLM call with SQL_FIX_PROMPT</li>
+        <li>Generates corrected SQL</li>
+        <li>Retry limit in graph router</li>
+      </ul>
+    </div>
+    <div class="card b-green">
+      <h3><span style="color:var(--green)">5</span> search_documents</h3>
+      <ul>
+        <li>Calls retriever_manager.search(query, top_k=5)</li>
+        <li>Returns {text, page, score, doc_name}</li>
+        <li>Works with BM25 or ChromaDB</li>
+        <li>Empty list on error</li>
+      </ul>
+    </div>
+    <div class="card b-amber">
+      <h3><span style="color:var(--amber)">6</span> synthesize_answer</h3>
+      <ul>
+        <li>Context varies by intent</li>
+        <li>nl2sql: SQL + results as JSON</li>
+        <li>rag: numbered citation chunks</li>
+        <li>Determines chart_type via heuristics</li>
+        <li>Builds citations from rag_chunks</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── Services ───────── -->
+<div class="section">
+  <div class="section-title">Service Layer</div>
+  <div class="cards">
+    <div class="card b-teal">
+      <h3><span style="color:var(--teal)">&#9672;</span> DatabaseManager <span class="mono" style="color:var(--muted); font-size:0.7rem">database.py</span></h3>
+      <ul>
+        <li><strong style="color:var(--text)">DuckDB in-memory</strong> &mdash; single connection</li>
+        <li><code>load_csv()</code> / <code>load_parquet()</code> &rarr; auto-detect schema</li>
+        <li><code>execute_query(sql)</code> &rarr; list of dicts</li>
+        <li><code>get_schema()</code> &rarr; CREATE TABLE statements</li>
+        <li><code>get_sample_data(table, 5)</code> &rarr; ASCII table</li>
+        <li>Singleton: <code>db_manager</code></li>
+      </ul>
+    </div>
+    <div class="card b-green">
+      <h3><span style="color:var(--green)">&#9672;</span> StorageManager <span class="mono" style="color:var(--muted); font-size:0.7rem">storage.py</span></h3>
+      <ul>
+        <li><code>csv_to_parquet()</code> via DuckDB (no pandas)</li>
+        <li>Optional S3 upload when AWS enabled</li>
+        <li><code>list_datasets()</code> &rarr; file metadata</li>
+        <li>Singleton: <code>storage_manager</code></li>
+      </ul>
+    </div>
+    <div class="card b-purple">
+      <h3><span style="color:var(--purple)">&#9672;</span> RetrieverManager <span class="mono" style="color:var(--muted); font-size:0.7rem">vectorstore.py</span></h3>
+      <ul>
+        <li><strong style="color:var(--text)">BM25Retriever</strong> (default) &mdash; pure Python, rank_bm25</li>
+        <li><strong style="color:var(--text)">ChromaRetriever</strong> (optional) &mdash; FastEmbed vectors</li>
+        <li><code>ingest_pdf(path)</code> &rarr; PyMuPDF chunks (500 chars, 100 overlap)</li>
+        <li><code>search(query, top_k=5)</code> &rarr; scored results</li>
+        <li>Persistent BM25 index on disk (JSON)</li>
+        <li>Singleton: <code>retriever_manager</code></li>
+      </ul>
+    </div>
+    <div class="card b-amber">
+      <h3><span style="color:var(--amber)">&#9672;</span> ConversationStore <span class="mono" style="color:var(--muted); font-size:0.7rem">conversations.py</span></h3>
+      <ul>
+        <li><strong style="color:var(--text)">InMemoryStore</strong> (default) &mdash; dict-based</li>
+        <li><strong style="color:var(--text)">DynamoDBStore</strong> (optional) &mdash; boto3</li>
+        <li>Partition key: conversation_id, sort: timestamp</li>
+        <li>Factory: <code>get_store()</code> with fallback</li>
+        <li>Singleton: <code>conversation_store</code></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── Config ───────── -->
+<div class="section">
+  <div class="section-title">Configuration (Pydantic Settings)</div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Setting</th><th>Default</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>LLM_PROVIDER</td><td class="mono">anthropic</td><td>anthropic or bedrock</td></tr>
+      <tr><td>ANTHROPIC_MODEL_ID</td><td class="mono">claude-sonnet-4-5-20250929</td><td>Direct API model</td></tr>
+      <tr><td>BEDROCK_MODEL_ID</td><td class="mono">us.anthropic.claude-sonnet-4-5-*</td><td>AWS Bedrock model</td></tr>
+      <tr><td>RAG_ENGINE</td><td class="mono">bm25</td><td>bm25 or chroma</td></tr>
+      <tr><td>SQL_MAX_RETRIES</td><td class="mono">1</td><td>SQL self-correction limit</td></tr>
+      <tr><td>DEMO_MODE</td><td class="mono">true</td><td>Canned responses + CORS *</td></tr>
+      <tr><td>ENABLE_AWS</td><td class="mono">false</td><td>S3 + DynamoDB + Bedrock</td></tr>
+      <tr><td>DATA_DIR</td><td class="mono">../data</td><td>CSV/PDF storage path</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ───────── Error Handling ───────── -->
+<div class="section">
+  <div class="section-title">Error Handling &amp; Resilience</div>
+  <div class="cards" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+    <div class="card b-rose">
+      <h3 style="font-size:0.85rem; color:var(--rose)">SQL Self-Correction</h3>
+      <p>execute_query error &rarr; fix_sql regenerates &rarr; retry (max SQL_MAX_RETRIES) &rarr; synthesize with error context if exhausted</p>
+    </div>
+    <div class="card b-amber">
+      <h3 style="font-size:0.85rem; color:var(--amber)">RAG Degradation</h3>
+      <p>search_documents catches exceptions &rarr; returns empty list &rarr; synthesis handles gracefully</p>
+    </div>
+    <div class="card b-green">
+      <h3 style="font-size:0.85rem; color:var(--green)">Storage Fallback</h3>
+      <p>DynamoDB init fails &rarr; logs warning &rarr; falls back to InMemoryStore automatically</p>
+    </div>
+    <div class="card b-purple">
+      <h3 style="font-size:0.85rem; color:var(--purple)">LLM Provider</h3>
+      <p>Bedrock missing langchain_aws &rarr; RuntimeError. Anthropic API key optional (env fallback).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── Startup ───────── -->
+<div class="section">
+  <div class="section-title">Application Startup (Lifespan)</div>
+  <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.25rem; font-size:0.82rem; color:var(--muted);">
+    <div style="display:flex; flex-direction:column; gap:0.4rem;">
+      <div><span style="color:var(--green); font-weight:600">1.</span> Auto-detect and load <code>sample_claims.csv</code> &rarr; DuckDB table</div>
+      <div><span style="color:var(--green); font-weight:600">2.</span> Convert CSV to Parquet (optional S3 upload)</div>
+      <div><span style="color:var(--green); font-weight:600">3.</span> Auto-detect and ingest <code>bcbs_benefits_summary.pdf</code> &rarr; RAG index</div>
+      <div><span style="color:var(--green); font-weight:600">4.</span> Display startup status: tables loaded, RAG engine, LLM provider, demo mode</div>
+      <div><span style="color:var(--green); font-weight:600">5.</span> Register CORS middleware (origins based on demo mode)</div>
+      <div><span style="color:var(--green); font-weight:600">6.</span> Mount 3 routers under <code>/api</code> prefix</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">BCBS Claims AI &mdash; Backend Architecture &mdash; FastAPI + LangGraph + Python 3.12</div>
+
+</div>
+</body>
+</html>

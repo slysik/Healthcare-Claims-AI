@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BCBS Claims AI - GenAI End-to-End Architecture</title>
+<style>
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155; --border: #475569;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8; --accent2: #818cf8;
+    --green: #4ade80; --amber: #fbbf24; --rose: #fb7185; --teal: #2dd4bf;
+    --purple: #a78bfa; --orange: #fb923c; --cyan: #22d3ee;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 0.25rem; background: linear-gradient(135deg, var(--purple), var(--rose)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 1rem; }
+  .section { margin-bottom: 2.5rem; }
+  .section-title { font-size: 1.1rem; font-weight: 600; color: var(--purple); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .section-title::before { content: ''; display: inline-block; width: 4px; height: 1.1em; border-radius: 2px; background: var(--purple); }
+
+  /* Path toggle */
+  .path-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; justify-content: center; }
+  .path-tab { padding: 0.6rem 1.5rem; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; background: var(--surface); color: var(--muted); }
+  .path-tab:first-child { border-radius: 8px 0 0 8px; }
+  .path-tab:last-child { border-radius: 0 8px 8px 0; }
+  .path-tab.active-sql { background: rgba(56,189,248,0.15); color: var(--accent); border-color: var(--accent); }
+  .path-tab.active-rag { background: rgba(45,212,191,0.15); color: var(--teal); border-color: var(--teal); }
+  .path-content { display: none; }
+  .path-content.active { display: block; }
+
+  /* Flow pipeline */
+  .pipeline { display: flex; flex-direction: column; gap: 0; align-items: center; }
+  .pipe-step { width: 100%; max-width: 900px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; position: relative; }
+  .pipe-step .step-num { position: absolute; top: -0.6em; left: 1.25rem; background: var(--accent); color: var(--bg); font-size: 0.65rem; font-weight: 700; width: 1.5em; height: 1.5em; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .pipe-step h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+  .pipe-step .step-detail { font-size: 0.82rem; color: var(--muted); }
+  .pipe-step .step-tech { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .pipe-step .pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.7rem; font-family: monospace; }
+  .pipe-arrow { color: var(--accent); font-size: 1.3rem; padding: 0.15rem 0; display: flex; align-items: center; gap: 0.5rem; }
+  .pipe-arrow .arrow-label { font-size: 0.7rem; color: var(--muted); }
+
+  /* Side-by-side columns */
+  .side-by-side { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .side-col { }
+  .side-col h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+
+  /* Prompt box */
+  .prompt-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.78rem; color: var(--muted); font-family: monospace; margin: 0.5rem 0; white-space: pre-wrap; max-height: 180px; overflow-y: auto; }
+
+  /* Highlight boxes */
+  .highlight { padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.82rem; margin: 0.5rem 0; }
+  .h-blue { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); }
+  .h-teal { background: rgba(45,212,191,0.1); border: 1px solid rgba(45,212,191,0.3); }
+  .h-amber { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); }
+  .h-rose { background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.3); }
+  .h-green { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); }
+  .h-purple { background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3); }
+
+  /* Cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem; }
+  .card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .card p { font-size: 0.78rem; color: var(--muted); }
+
+  .b-blue { border-left: 3px solid var(--accent); }
+  .b-teal { border-left: 3px solid var(--teal); }
+  .b-purple { border-left: 3px solid var(--purple); }
+  .b-amber { border-left: 3px solid var(--amber); }
+  .b-green { border-left: 3px solid var(--green); }
+  .b-rose { border-left: 3px solid var(--rose); }
+
+  /* Comparison table */
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { text-align: left; padding: 0.6rem 0.75rem; background: var(--surface2); color: var(--text); font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); }
+  .mono { font-family: monospace; font-size: 0.75rem; }
+
+  .footer { text-align: center; color: var(--muted); font-size: 0.75rem; padding-top: 2rem; border-top: 1px solid var(--border); margin-top: 1rem; }
+
+  @media (max-width: 800px) { body { padding: 1rem; } .side-by-side { grid-template-columns: 1fr; } .cards { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>GenAI Architecture &mdash; End to End</h1>
+<p class="subtitle">How the LangGraph agent processes queries through NL2SQL (structured data) and RAG (PDF documents)</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SHARED ENTRY POINT -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section">
+  <div class="section-title">Shared Entry Point &mdash; Intent Classification</div>
+  <div class="pipeline">
+    <div class="pipe-step b-purple">
+      <span class="step-num" style="background:var(--purple)">1</span>
+      <h3 style="color:var(--purple)">User Query Arrives</h3>
+      <div class="step-detail">
+        User submits natural language question via chat UI. The query, conversation history, and a new conversation ID are sent to <code>POST /api/chat/stream</code>.
+      </div>
+      <div class="step-tech">
+        <span class="pill">ChatPanel.tsx</span>
+        <span class="pill">useChat.sendMessage()</span>
+        <span class="pill">SSE connection opened</span>
+      </div>
+    </div>
+    <div class="pipe-arrow">&darr; <span class="arrow-label">POST /api/chat/stream</span></div>
+    <div class="pipe-step b-purple">
+      <span class="step-num" style="background:var(--purple)">2</span>
+      <h3 style="color:var(--purple)">classify_intent <span style="font-size:0.75rem; color:var(--muted); font-weight:400">(LangGraph Node 1)</span></h3>
+      <div class="step-detail">
+        Claude receives the user query along with the <strong>full database schema</strong> (CREATE TABLE statements) and <strong>list of indexed documents</strong>. It returns a JSON object with the intent classification and reasoning.
+      </div>
+      <div class="highlight h-purple">
+        <strong>LLM Prompt includes:</strong><br>
+        &bull; Database schema (all loaded tables)<br>
+        &bull; List of ingested PDF documents<br>
+        &bull; User query<br>
+        &bull; Instructions: respond with <code>{"intent": "nl2sql"|"rag"|"clarify", "reasoning": "..."}</code>
+      </div>
+      <div class="step-tech">
+        <span class="pill">agent/nodes.py:classify_intent</span>
+        <span class="pill">agent/prompts.py:CLASSIFY_PROMPT</span>
+        <span class="pill">Claude Sonnet 4.5</span>
+      </div>
+    </div>
+    <div class="pipe-arrow">&darr; <span class="arrow-label">route_by_intent()</span></div>
+
+    <div style="display:flex; gap:1rem; width:100%; max-width:900px; flex-wrap: wrap;">
+      <div style="flex:1; min-width:200px; text-align:center; padding:0.75rem; background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.3); border-radius:8px;">
+        <div style="font-weight:600; color:var(--accent); font-size:0.9rem;">intent = "nl2sql"</div>
+        <div style="font-size:0.75rem; color:var(--muted)">Data analytics question about claims, costs, providers, etc.</div>
+        <div style="margin-top:0.3rem; font-size:0.7rem; color:var(--accent)">&darr; NL2SQL Path</div>
+      </div>
+      <div style="flex:1; min-width:200px; text-align:center; padding:0.75rem; background:rgba(45,212,191,0.08); border:1px solid rgba(45,212,191,0.3); border-radius:8px;">
+        <div style="font-weight:600; color:var(--teal); font-size:0.9rem;">intent = "rag"</div>
+        <div style="font-size:0.75rem; color:var(--muted)">Policy question about benefits, deductibles, coverage, etc.</div>
+        <div style="margin-top:0.3rem; font-size:0.7rem; color:var(--teal)">&darr; RAG Path</div>
+      </div>
+      <div style="flex:1; min-width:200px; text-align:center; padding:0.75rem; background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.3); border-radius:8px;">
+        <div style="font-weight:600; color:var(--amber); font-size:0.9rem;">intent = "clarify"</div>
+        <div style="font-size:0.75rem; color:var(--muted)">Ambiguous query that needs more context</div>
+        <div style="margin-top:0.3rem; font-size:0.7rem; color:var(--amber)">&darr; Direct to Synthesize</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SIDE BY SIDE: NL2SQL vs RAG -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section">
+  <div class="section-title">Dual Intelligence Paths</div>
+
+  <div class="side-by-side">
+
+    <!-- ───── NL2SQL Path ───── -->
+    <div class="side-col">
+      <h2><span style="color:var(--accent)">&#9632;</span> NL2SQL Path <span style="font-size:0.75rem; color:var(--muted); font-weight:400">&mdash; Structured Data Analytics</span></h2>
+
+      <div class="pipeline" style="align-items: stretch;">
+        <div class="pipe-step b-blue" style="max-width:none">
+          <span class="step-num">3</span>
+          <h3 style="color:var(--accent); font-size:0.85rem">generate_sql</h3>
+          <div class="step-detail">Claude generates DuckDB-compatible SQL from the natural language query.</div>
+          <div class="highlight h-blue" style="font-size:0.75rem">
+            <strong>LLM receives:</strong><br>
+            &bull; Full CREATE TABLE schema<br>
+            &bull; 5 sample rows (ASCII table format)<br>
+            &bull; DuckDB SQL rules (single quotes, GROUP BY, etc.)<br>
+            &bull; Common patterns (aggregations, time series)<br><br>
+            <strong>LLM outputs:</strong> SQL query in markdown code block
+          </div>
+        </div>
+        <div class="pipe-arrow">&darr;</div>
+        <div class="pipe-step b-blue" style="max-width:none">
+          <span class="step-num">4</span>
+          <h3 style="color:var(--accent); font-size:0.85rem">execute_query</h3>
+          <div class="step-detail">Runs SQL against DuckDB in-memory database containing 1,000 synthetic claims.</div>
+          <div class="highlight h-blue" style="font-size:0.75rem">
+            <strong>DuckDB executes:</strong> Generated SQL<br>
+            <strong>Returns:</strong> <code>list[dict]</code> &mdash; each row as key-value pairs<br>
+            <strong>On error:</strong> Captures error message + increments retry counter
+          </div>
+        </div>
+        <div class="pipe-arrow" style="flex-direction:column; gap:0.2rem">
+          <div style="display:flex; gap:1rem; align-items:center; justify-content:center;">
+            <div style="text-align:center">
+              <div style="color:var(--green); font-size:1rem">&darr;</div>
+              <div style="font-size:0.65rem; color:var(--green)">Success</div>
+            </div>
+            <div style="text-align:center">
+              <div style="color:var(--rose); font-size:1rem">&darr;</div>
+              <div style="font-size:0.65rem; color:var(--rose)">Error + retries left</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:0.5rem; width:100%;">
+          <div class="pipe-step b-green" style="max-width:none; flex:1">
+            <h3 style="color:var(--green); font-size:0.8rem">Continue &rarr; Synthesize</h3>
+            <div class="step-detail" style="font-size:0.75rem">SQL succeeded, results ready for final answer generation</div>
+          </div>
+          <div class="pipe-step b-rose" style="max-width:none; flex:1">
+            <h3 style="color:var(--rose); font-size:0.8rem">fix_sql &rarr; Retry</h3>
+            <div class="step-detail" style="font-size:0.75rem">Claude analyzes error, rewrites SQL, retries execute_query (max <code>SQL_MAX_RETRIES</code>)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight h-blue" style="margin-top:1rem">
+        <strong style="color:var(--accent)">Example Query:</strong> "What are the top 5 diagnosis codes by claim count?"<br><br>
+        <strong>Generated SQL:</strong><br>
+        <code style="font-size:0.75rem">SELECT diagnosis_code, COUNT(*) as claim_count<br>FROM claims<br>GROUP BY diagnosis_code<br>ORDER BY claim_count DESC<br>LIMIT 5</code><br><br>
+        <strong>Output:</strong> Table + bar chart
+      </div>
+    </div>
+
+    <!-- ───── RAG Path ───── -->
+    <div class="side-col">
+      <h2><span style="color:var(--teal)">&#9632;</span> RAG Path <span style="font-size:0.75rem; color:var(--muted); font-weight:400">&mdash; PDF Document Q&A</span></h2>
+
+      <div class="pipeline" style="align-items:stretch;">
+        <div class="pipe-step b-teal" style="max-width:none">
+          <span class="step-num" style="background:var(--teal)">3</span>
+          <h3 style="color:var(--teal); font-size:0.85rem">PDF Ingestion (at startup)</h3>
+          <div class="step-detail">Benefits PDF is chunked and indexed when the server starts.</div>
+          <div class="highlight h-teal" style="font-size:0.75rem">
+            <strong>PyMuPDF (fitz)</strong> extracts text + page numbers<br>
+            <strong>Chunking:</strong> 500 chars per chunk, 100 char overlap<br>
+            <strong>BM25:</strong> Tokenized, stop-word filtered, BM25Okapi index<br>
+            <strong>ChromaDB:</strong> FastEmbed vectors, cosine similarity index<br>
+            <strong>Stored:</strong> {text, page, doc_name} per chunk
+          </div>
+        </div>
+        <div class="pipe-arrow">&darr;</div>
+        <div class="pipe-step b-teal" style="max-width:none">
+          <span class="step-num" style="background:var(--teal)">4</span>
+          <h3 style="color:var(--teal); font-size:0.85rem">search_documents</h3>
+          <div class="step-detail">Retrieves top-k most relevant chunks from the indexed PDF.</div>
+          <div class="highlight h-teal" style="font-size:0.75rem">
+            <strong>Query:</strong> User's natural language question<br>
+            <strong>top_k:</strong> 5 chunks<br>
+            <strong>Returns per chunk:</strong><br>
+            &bull; <code>text</code> &mdash; 500-char excerpt<br>
+            &bull; <code>page</code> &mdash; source page number<br>
+            &bull; <code>score</code> &mdash; relevance (0.0 &ndash; 1.0)<br>
+            &bull; <code>doc_name</code> &mdash; source filename
+          </div>
+        </div>
+        <div class="pipe-arrow">&darr;</div>
+        <div class="pipe-step b-green" style="max-width:none">
+          <h3 style="color:var(--green); font-size:0.8rem">Continue &rarr; Synthesize</h3>
+          <div class="step-detail" style="font-size:0.75rem">Retrieved chunks passed as numbered citations to synthesis prompt</div>
+        </div>
+      </div>
+
+      <div class="highlight h-teal" style="margin-top:1rem">
+        <strong style="color:var(--teal)">Example Query:</strong> "What is the deductible for in-network services?"<br><br>
+        <strong>Retrieved Chunks:</strong><br>
+        <code style="font-size:0.75rem">[1] p.3: "In-network deductible: $1,500 individual..."<br>[2] p.3: "Family deductible: $3,000 in-network..."<br>[3] p.5: "Deductible applies to most services..."</code><br><br>
+        <strong>Output:</strong> Natural language answer + source citations
+      </div>
+
+      <div style="margin-top:1rem;">
+        <div style="font-size:0.8rem; font-weight:600; color:var(--muted); margin-bottom:0.5rem">RAG Engine Comparison</div>
+        <table>
+          <thead><tr><th>Feature</th><th>BM25</th><th>ChromaDB</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--text)">Search Type</td><td>Keyword (TF-IDF)</td><td>Semantic (vector)</td></tr>
+            <tr><td style="color:var(--text)">Setup</td><td>Instant, ~20KB</td><td>Model download</td></tr>
+            <tr><td style="color:var(--text)">Dependencies</td><td>rank_bm25</td><td>chromadb + fastembed</td></tr>
+            <tr><td style="color:var(--text)">Best For</td><td>Small PDFs, demos</td><td>Large doc sets</td></tr>
+            <tr><td style="color:var(--text)">Persistence</td><td>JSON file</td><td>ChromaDB collection</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SHARED SYNTHESIS -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section">
+  <div class="section-title">Shared Synthesis &mdash; Final Answer Generation</div>
+  <div class="pipeline">
+    <div class="pipe-step b-amber" style="max-width:900px">
+      <span class="step-num" style="background:var(--amber)">5</span>
+      <h3 style="color:var(--amber)">synthesize_answer <span style="font-size:0.75rem; color:var(--muted); font-weight:400">(LangGraph Node 6)</span></h3>
+      <div class="step-detail">Both paths converge here. Claude generates a natural language answer with the appropriate context.</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:0.75rem; margin-top:0.75rem;">
+        <div class="highlight h-blue" style="margin:0">
+          <div style="font-size:0.75rem; font-weight:600; color:var(--accent)">NL2SQL Context</div>
+          <div style="font-size:0.72rem; color:var(--muted); margin-top:0.25rem">
+            &bull; Generated SQL query<br>
+            &bull; Query results as JSON<br>
+            &bull; Chart type heuristic<br>
+            &bull; "Summarize findings"
+          </div>
+        </div>
+        <div class="highlight h-teal" style="margin:0">
+          <div style="font-size:0.75rem; font-weight:600; color:var(--teal)">RAG Context</div>
+          <div style="font-size:0.72rem; color:var(--muted); margin-top:0.25rem">
+            &bull; Numbered citation chunks<br>
+            &bull; Page + doc references<br>
+            &bull; "Answer with citations"<br>
+            &bull; RAG_SYNTHESIS_PROMPT
+          </div>
+        </div>
+        <div class="highlight h-amber" style="margin:0">
+          <div style="font-size:0.75rem; font-weight:600; color:var(--amber)">Clarify Context</div>
+          <div style="font-size:0.72rem; color:var(--muted); margin-top:0.25rem">
+            &bull; Available capabilities<br>
+            &bull; Schema summary<br>
+            &bull; "Ask for specifics"<br>
+            &bull; SYNTHESIZE_PROMPT
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pipe-arrow">&darr; <span class="arrow-label">Build AgentResponse</span></div>
+    <div class="pipe-step b-green" style="max-width:900px">
+      <span class="step-num" style="background:var(--green)">6</span>
+      <h3 style="color:var(--green)">Stream Response to Client</h3>
+      <div class="step-detail">The complete response is packaged as an AgentResponse and streamed via SSE events.</div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.75rem;">
+        <div style="background:var(--surface2); border-radius:6px; padding:0.4rem 0.75rem; font-size:0.75rem;">
+          <strong style="color:var(--teal)">trace</strong> <span style="color:var(--muted)">node execution events</span>
+        </div>
+        <div style="background:var(--surface2); border-radius:6px; padding:0.4rem 0.75rem; font-size:0.75rem;">
+          <strong style="color:var(--amber)">answer_chunk</strong> <span style="color:var(--muted)">20-char streaming text</span>
+        </div>
+        <div style="background:var(--surface2); border-radius:6px; padding:0.4rem 0.75rem; font-size:0.75rem;">
+          <strong style="color:var(--green)">complete</strong> <span style="color:var(--muted)">full AgentResponse JSON</span>
+        </div>
+        <div style="background:var(--surface2); border-radius:6px; padding:0.4rem 0.75rem; font-size:0.75rem;">
+          <strong style="color:var(--rose)">error</strong> <span style="color:var(--muted)">recoverable error event</span>
+        </div>
+      </div>
+    </div>
+    <div class="pipe-arrow">&darr; <span class="arrow-label">SSE text/event-stream</span></div>
+    <div class="pipe-step b-purple" style="max-width:900px">
+      <span class="step-num" style="background:var(--purple)">7</span>
+      <h3 style="color:var(--purple)">Frontend Renders</h3>
+      <div class="step-detail">MessageBubble conditionally renders rich components based on the response data.</div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem;">
+        <div style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:6px; padding:0.3rem 0.6rem; font-size:0.72rem; color:var(--accent)">
+          <strong>NL2SQL &rarr;</strong> AgentTrace + SqlViewer + ResultsTable + ChartView
+        </div>
+        <div style="background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.3); border-radius:6px; padding:0.3rem 0.6rem; font-size:0.72rem; color:var(--teal)">
+          <strong>RAG &rarr;</strong> AgentTrace + Answer (Markdown) + Citations
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- DATA SOURCES -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section">
+  <div class="section-title">Data Sources</div>
+  <div class="side-by-side">
+    <div class="card b-blue">
+      <h3 style="color:var(--accent)">Structured Data &mdash; Claims CSV</h3>
+      <p><strong style="color:var(--text)">1,000 synthetic healthcare claims</strong> (no real PHI)</p>
+      <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--muted);">
+        <strong>Columns:</strong> claim_id, patient_id, provider, diagnosis_code (ICD-10), procedure_code (CPT), claim_amount, status (PAID/DENIED/PENDING), denial_reason, service_date<br><br>
+        <strong>Pipeline:</strong> CSV &rarr; Parquet conversion &rarr; DuckDB in-memory table &rarr; SQL query execution
+      </div>
+    </div>
+    <div class="card b-teal">
+      <h3 style="color:var(--teal)">Unstructured Data &mdash; Benefits PDF</h3>
+      <p><strong style="color:var(--text)">10-page BCBS benefits summary</strong> (generated with fpdf2)</p>
+      <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--muted);">
+        <strong>Content:</strong> Deductibles, copays, covered services, telehealth, prior authorization, exclusions<br><br>
+        <strong>Pipeline:</strong> PDF &rarr; PyMuPDF text extraction &rarr; 500-char overlapping chunks &rarr; BM25/ChromaDB index &rarr; similarity search
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LLM CALLS -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section">
+  <div class="section-title">LLM Call Map &mdash; Where Claude Is Invoked</div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr><th>Node</th><th>Prompt Template</th><th>Input Context</th><th>Output</th><th>Path</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--purple)">classify_intent</td>
+        <td class="mono">CLASSIFY_PROMPT</td>
+        <td>Schema + doc list + query</td>
+        <td class="mono">{"intent", "reasoning"}</td>
+        <td>Both</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent)">generate_sql</td>
+        <td class="mono">SQL_GENERATION_PROMPT</td>
+        <td>Schema + 5 sample rows + query</td>
+        <td>SQL in code block</td>
+        <td>NL2SQL</td>
+      </tr>
+      <tr>
+        <td style="color:var(--rose)">fix_sql</td>
+        <td class="mono">SQL_FIX_PROMPT</td>
+        <td>Broken SQL + error + schema</td>
+        <td>Corrected SQL</td>
+        <td>NL2SQL (retry)</td>
+      </tr>
+      <tr>
+        <td style="color:var(--amber)">synthesize (nl2sql)</td>
+        <td class="mono">SYNTHESIZE_PROMPT</td>
+        <td>SQL + query results JSON</td>
+        <td>Natural language answer</td>
+        <td>NL2SQL</td>
+      </tr>
+      <tr>
+        <td style="color:var(--amber)">synthesize (rag)</td>
+        <td class="mono">RAG_SYNTHESIS_PROMPT</td>
+        <td>Numbered citation chunks</td>
+        <td>Answer with citations</td>
+        <td>RAG</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div style="margin-top:0.75rem; font-size:0.78rem; color:var(--muted); text-align:center;">
+    <strong>Total LLM calls per query:</strong>
+    NL2SQL = 3 calls (classify + generate_sql + synthesize) &bull;
+    RAG = 2 calls (classify + synthesize) &bull;
+    SQL retry adds 2 more (fix_sql + re-synthesize)
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SELF CORRECTION -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section">
+  <div class="section-title">SQL Self-Correction Loop</div>
+  <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.5rem; max-width:900px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center; justify-content:center;">
+      <div style="background:var(--surface2); border-radius:8px; padding:0.6rem 0.9rem; text-align:center; min-width:120px;">
+        <div style="font-size:0.8rem; font-weight:600; color:var(--accent)">generate_sql</div>
+        <div style="font-size:0.68rem; color:var(--muted)">LLM writes SQL</div>
+      </div>
+      <div style="color:var(--accent)">&rarr;</div>
+      <div style="background:var(--surface2); border-radius:8px; padding:0.6rem 0.9rem; text-align:center; min-width:120px;">
+        <div style="font-size:0.8rem; font-weight:600; color:var(--teal)">execute_query</div>
+        <div style="font-size:0.68rem; color:var(--muted)">DuckDB runs SQL</div>
+      </div>
+      <div style="color:var(--accent)">&rarr;</div>
+      <div style="background:rgba(251,113,133,0.1); border:1px solid rgba(251,113,133,0.3); border-radius:8px; padding:0.6rem 0.9rem; text-align:center; min-width:140px;">
+        <div style="font-size:0.8rem; font-weight:600; color:var(--rose)">route_after_execute</div>
+        <div style="font-size:0.68rem; color:var(--muted)">Error? Retries left?</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.2rem;">
+        <div style="display:flex; align-items:center; gap:0.3rem;">
+          <span style="color:var(--rose)">&rarr;</span>
+          <div style="background:rgba(251,113,133,0.1); border:1px solid rgba(251,113,133,0.3); border-radius:8px; padding:0.4rem 0.7rem; text-align:center;">
+            <div style="font-size:0.78rem; font-weight:600; color:var(--rose)">fix_sql</div>
+            <div style="font-size:0.65rem; color:var(--muted)">LLM rewrites</div>
+          </div>
+          <span style="color:var(--rose)">&circlearrowleft;</span>
+        </div>
+        <div style="font-size:0.65rem; color:var(--muted)">retry_count &lt; SQL_MAX_RETRIES</div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:0.75rem; font-size:0.78rem; color:var(--muted);">
+      If max retries exhausted &rarr; <strong style="color:var(--amber)">synthesize</strong> with error context ("I couldn't generate valid SQL for...")
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- RESPONSE COMPARISON -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section">
+  <div class="section-title">Response Shape Comparison</div>
+  <div class="side-by-side">
+    <div class="card b-blue">
+      <h3 style="color:var(--accent)">NL2SQL Response</h3>
+      <div class="prompt-box" style="max-height:220px">{
+  "intent": "nl2sql",
+  "answer": "Based on the data, PROCESSED claims total $45,231...",
+  "sql": "SELECT status, COUNT(*), SUM(amount) FROM claims GROUP BY status",
+  "query_results": [
+    {"status": "PAID", "count": 450, "total": 45231.50},
+    {"status": "DENIED", "count": 123, "total": 12456.00},
+    {"status": "PENDING", "count": 87, "total": 8901.25}
+  ],
+  "chart_type": "bar",
+  "citations": null,
+  "agent_trace": [...],
+  "timing_ms": 2340,
+  "sql_retries": 0
+}</div>
+      <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--muted)">
+        <strong>Renders:</strong> AgentTrace &rarr; Answer &rarr; SqlViewer &rarr; ResultsTable &rarr; BarChart
+      </div>
+    </div>
+    <div class="card b-teal">
+      <h3 style="color:var(--teal)">RAG Response</h3>
+      <div class="prompt-box" style="max-height:220px">{
+  "intent": "rag",
+  "answer": "The in-network deductible is $1,500 per individual...",
+  "sql": null,
+  "query_results": null,
+  "chart_type": null,
+  "citations": [
+    {
+      "text": "In-network deductible: $1,500 individual...",
+      "page": 3,
+      "doc_name": "bcbs_benefits_summary.pdf",
+      "score": 0.89
+    },
+    {
+      "text": "Family deductible: $3,000 in-network...",
+      "page": 3,
+      "doc_name": "bcbs_benefits_summary.pdf",
+      "score": 0.82
+    }
+  ],
+  "agent_trace": [...],
+  "timing_ms": 1850
+}</div>
+      <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--muted)">
+        <strong>Renders:</strong> AgentTrace &rarr; Answer (Markdown) &rarr; Citations (expandable)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- KEY DESIGN DECISIONS -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section">
+  <div class="section-title">Key GenAI Design Decisions</div>
+  <div class="cards" style="grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));">
+    <div class="card b-purple">
+      <h3 style="font-size:0.85rem; color:var(--purple)">Router Agent Pattern</h3>
+      <p>Single entry point classifies intent before routing. Avoids running both NL2SQL and RAG unnecessarily. Reduces LLM calls and cost.</p>
+    </div>
+    <div class="card b-blue">
+      <h3 style="font-size:0.85rem; color:var(--accent)">Schema-Aware SQL Gen</h3>
+      <p>LLM always sees actual table schema + sample data. Dramatically reduces hallucinated column names and invalid SQL syntax.</p>
+    </div>
+    <div class="card b-rose">
+      <h3 style="font-size:0.85rem; color:var(--rose)">Self-Correcting SQL</h3>
+      <p>SQL errors feed back into the agent loop. Fix node receives the error message + schema. Configurable max retries prevents infinite loops.</p>
+    </div>
+    <div class="card b-teal">
+      <h3 style="font-size:0.85rem; color:var(--teal)">Dual RAG Engines</h3>
+      <p>BM25 for demos (zero downloads, instant). ChromaDB for production (semantic search). Swap via env var, no code changes. Same interface.</p>
+    </div>
+    <div class="card b-amber">
+      <h3 style="font-size:0.85rem; color:var(--amber)">Chart Type Heuristics</h3>
+      <p>Synthesize node picks chart type by analyzing query keywords ("trend" &rarr; line, "distribution" &rarr; pie) and data shape (categories &rarr; bar).</p>
+    </div>
+    <div class="card b-green">
+      <h3 style="font-size:0.85rem; color:var(--green)">Streaming Trace</h3>
+      <p>Every agent node emits SSE trace events. UI shows real-time node-by-node execution with timing. Builds user trust through transparency.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">BCBS Claims AI &mdash; GenAI End-to-End Architecture &mdash; LangGraph + Claude + DuckDB + BM25/ChromaDB</div>
+
+</div>
+</body>
+</html>

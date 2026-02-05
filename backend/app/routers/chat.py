@@ -25,11 +25,11 @@ CANNED_RESPONSES = {
             "Here's a breakdown of total charges by claim status:\n\n"
             "| Claim Status | Claim Count | Total Charges |\n"
             "|---|---|---|\n"
-            "| PROCESSED | 14 | $9,071.35 |\n"
+            "| PROCESSED | 14 | $10,271.35 |\n"
             "| DENIED | 4 | $485.00 |\n\n"
-            "14 of your 18 claims were processed successfully. "
-            "The 4 denied claims total $485.00, all from Lowcountry Urology Clinics "
-            "and Medical Select Inc, with the full amount falling to patient liability."
+            "14 of 18 claims were processed successfully, totaling $10,271.35. "
+            "The 4 denied claims total $485.00 — 3 from Lowcountry Urology Clinics PA "
+            "and 1 from Medical Select Inc."
         ),
         sql=(
             "SELECT \"Claim Status\", COUNT(*) as claim_count, "
@@ -42,12 +42,47 @@ CANNED_RESPONSES = {
             {
                 "Claim Status": "PROCESSED",
                 "claim_count": 14,
-                "total_charges": 9071.35,
+                "total_charges": 10271.35,
             },
             {
                 "Claim Status": "DENIED",
                 "claim_count": 4,
                 "total_charges": 485.00,
+            },
+        ],
+        chart_type="bar",
+        agent_trace=[],
+        timing_ms=150,
+    ),
+    "which providers have denied claims": AgentResponse(
+        intent="nl2sql",
+        answer=(
+            "Two providers have denied claims:\n\n"
+            "| Provider | Denied Claims | Total Denied |\n"
+            "|---|---|---|\n"
+            "| Lowcountry Urology Clinics PA | 3 | $450.00 |\n"
+            "| Medical Select Inc DBA NEB Doctors of S | 1 | $35.00 |\n\n"
+            "Lowcountry Urology accounts for 3 of the 4 denied claims ($450), "
+            "all for Steve Lysik. The Medical Select denial was $35 for Noelle Lysik."
+        ),
+        sql=(
+            "SELECT \"Provider\", COUNT(*) as denied_count, "
+            "SUM(CAST(REPLACE(REPLACE(\"Total Charges\", '$', ''), ',', '') AS DECIMAL(10,2))) "
+            "as total_denied "
+            "FROM HealthClaimsList_Feb24_Feb26 "
+            "WHERE \"Claim Status\" = 'DENIED' "
+            "GROUP BY \"Provider\" ORDER BY denied_count DESC"
+        ),
+        query_results=[
+            {
+                "Provider": "LOWCOUNTRY UROLOGY CLINICS PA",
+                "denied_count": 3,
+                "total_denied": 450.00,
+            },
+            {
+                "Provider": "MEDICAL SELECT INC DBA NEB DOCTORS OF S",
+                "denied_count": 1,
+                "total_denied": 35.00,
             },
         ],
         chart_type="bar",

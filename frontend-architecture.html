@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BCBS Claims AI - Frontend Architecture</title>
+<style>
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155; --border: #475569;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8; --accent2: #818cf8;
+    --green: #4ade80; --amber: #fbbf24; --rose: #fb7185; --teal: #2dd4bf;
+    --purple: #a78bfa; --orange: #fb923c; --cyan: #22d3ee;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 0.25rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 2.5rem; }
+  .section { margin-bottom: 2.5rem; }
+  .section-title { font-size: 1.05rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .section-title::before { content: ''; display: inline-block; width: 4px; height: 1.1em; border-radius: 2px; background: var(--accent); }
+
+  /* Tech banner */
+  .tech-banner { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 2.5rem; }
+  .tech-pill { background: var(--surface); border: 1px solid var(--border); border-radius: 99px; padding: 0.35rem 0.85rem; font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+  .tech-pill strong { color: var(--text); }
+
+  /* Component tree */
+  .tree { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.82rem; overflow-x: auto; }
+  .tree .node { padding: 0.15rem 0; }
+  .tree .indent { display: inline-block; }
+  .tree .branch { color: var(--border); }
+  .tree .comp { color: var(--accent); font-weight: 600; }
+  .tree .hook { color: var(--teal); font-weight: 600; }
+  .tree .file { color: var(--muted); font-size: 0.7rem; }
+  .tree .desc { color: var(--muted); font-style: italic; }
+
+  /* Cards grid */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+  .card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .card p, .card li { font-size: 0.82rem; color: var(--muted); }
+  .card ul { list-style: none; padding-left: 0; }
+  .card ul li { padding: 0.2rem 0; position: relative; padding-left: 1rem; }
+  .card ul li::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .dot-blue::before { background: var(--accent) !important; }
+  .dot-green::before { background: var(--green) !important; }
+  .dot-purple::before { background: var(--purple) !important; }
+  .dot-amber::before { background: var(--amber) !important; }
+  .dot-teal::before { background: var(--teal) !important; }
+
+  /* Flow diagram */
+  .flow { display: flex; flex-direction: column; gap: 0; align-items: center; }
+  .flow-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.5rem; width: 100%; max-width: 700px; }
+  .flow-box h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .flow-box p { font-size: 0.78rem; color: var(--muted); }
+  .flow-arrow { color: var(--accent); font-size: 1.3rem; padding: 0.15rem 0; }
+  .flow-label { font-size: 0.7rem; color: var(--muted); text-align: center; }
+
+  /* Props table */
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { text-align: left; padding: 0.6rem 0.75rem; background: var(--surface2); color: var(--text); font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); }
+  td:first-child { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.78rem; }
+  tr:hover td { background: rgba(56,189,248,0.05); }
+  .type { color: var(--purple); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+
+  /* State diagram */
+  .state-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; }
+  .state-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; }
+  .state-item .name { font-family: monospace; font-size: 0.8rem; font-weight: 600; color: var(--cyan); }
+  .state-item .stype { font-size: 0.7rem; color: var(--purple); margin-top: 0.15rem; }
+  .state-item .sdesc { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
+
+  /* Borders */
+  .b-blue { border-left: 3px solid var(--accent); }
+  .b-green { border-left: 3px solid var(--green); }
+  .b-purple { border-left: 3px solid var(--purple); }
+  .b-amber { border-left: 3px solid var(--amber); }
+  .b-teal { border-left: 3px solid var(--teal); }
+  .b-rose { border-left: 3px solid var(--rose); }
+
+  .footer { text-align: center; color: var(--muted); font-size: 0.75rem; padding-top: 2rem; border-top: 1px solid var(--border); margin-top: 1rem; }
+  @media (max-width: 700px) { body { padding: 1rem; } .cards { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Frontend Architecture</h1>
+<p class="subtitle">React + Vite + TypeScript + Tailwind CSS + shadcn/ui</p>
+
+<div class="tech-banner">
+  <span class="tech-pill"><strong>React 18</strong> UI</span>
+  <span class="tech-pill"><strong>Vite</strong> Build</span>
+  <span class="tech-pill"><strong>TypeScript</strong> Types</span>
+  <span class="tech-pill"><strong>Tailwind</strong> Styling</span>
+  <span class="tech-pill"><strong>Recharts</strong> Charts</span>
+  <span class="tech-pill"><strong>Lucide</strong> Icons</span>
+  <span class="tech-pill"><strong>ReactMarkdown</strong> Rendering</span>
+  <span class="tech-pill"><strong>SSE</strong> Streaming</span>
+</div>
+
+<!-- ───────── Component Hierarchy ───────── -->
+<div class="section">
+  <div class="section-title">Component Hierarchy</div>
+  <div class="tree">
+    <div class="node"><span class="comp">App</span> <span class="file">App.tsx</span> <span class="desc">— root, tab state</span></div>
+    <div class="node"><span class="indent" style="width:1.5rem"></span><span class="branch">├── </span><span class="comp">Layout</span> <span class="file">Layout.tsx</span> <span class="desc">— header, tabs, footer, fetchConfig()</span></div>
+    <div class="node"><span class="indent" style="width:3rem"></span><span class="branch">├── </span><span class="comp">ChatPanel</span> <span class="file">ChatPanel.tsx</span> <span class="desc">— chat UI, input, suggested queries</span></div>
+    <div class="node"><span class="indent" style="width:4.5rem"></span><span class="branch">├── </span><span class="hook">useChat</span> <span class="file">hooks/useChat.ts</span> <span class="desc">— SSE streaming hook, state mgmt</span></div>
+    <div class="node"><span class="indent" style="width:4.5rem"></span><span class="branch">├── </span><span class="comp">MessageBubble</span> <span class="file">MessageBubble.tsx</span> <span class="desc">— renders each message</span></div>
+    <div class="node"><span class="indent" style="width:6rem"></span><span class="branch">├── </span><span class="comp">AgentTrace</span> <span class="file">AgentTrace.tsx</span> <span class="desc">— node execution badges</span></div>
+    <div class="node"><span class="indent" style="width:6rem"></span><span class="branch">├── </span><span class="comp">SqlViewer</span> <span class="file">SqlViewer.tsx</span> <span class="desc">— collapsible SQL + copy</span></div>
+    <div class="node"><span class="indent" style="width:6rem"></span><span class="branch">├── </span><span class="comp">ResultsTable</span> <span class="file">ResultsTable.tsx</span> <span class="desc">— sortable data table (50 rows max)</span></div>
+    <div class="node"><span class="indent" style="width:6rem"></span><span class="branch">├── </span><span class="comp">ChartView</span> <span class="file">ChartView.tsx</span> <span class="desc">— Recharts bar/line/pie</span></div>
+    <div class="node"><span class="indent" style="width:6rem"></span><span class="branch">└── </span><span class="comp">Citations</span> <span class="file">Citations.tsx</span> <span class="desc">— expandable RAG sources</span></div>
+    <div class="node"><span class="indent" style="width:4.5rem"></span><span class="branch">└── </span><span style="color:var(--muted); font-style:italic">AgentTrace (live streaming trace)</span></div>
+    <div class="node"><span class="indent" style="width:3rem"></span><span class="branch">└── </span><span class="comp">UploadPanel</span> <span class="file">UploadPanel.tsx</span> <span class="desc">— drag-drop CSV/PDF upload</span></div>
+    <div class="node"><span class="indent" style="width:1.5rem"></span><span class="branch">└── </span><span class="hook">api</span> <span class="file">lib/api.ts</span> <span class="desc">— typed fetch wrapper, interfaces</span></div>
+  </div>
+</div>
+
+<!-- ───────── SSE Data Flow ───────── -->
+<div class="section">
+  <div class="section-title">SSE Streaming Data Flow</div>
+  <div class="flow">
+    <div class="flow-box b-blue">
+      <h4 style="color:var(--accent)">1. User Input</h4>
+      <p>User types query in ChatPanel textarea &rarr; <code>sendMessage(query)</code> via useChat hook</p>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box b-purple">
+      <h4 style="color:var(--purple)">2. SSE Connection</h4>
+      <p><code>POST /api/chat/stream</code> with AbortController &mdash; ReadableStream + TextDecoder parses chunked JSON lines prefixed with <code>data: </code></p>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box" style="border: 1px dashed var(--border); display:flex; gap:1rem; flex-wrap:wrap; padding: 0.75rem;">
+      <div style="flex:1; min-width:140px; padding:0.5rem; border-right:1px solid var(--border)">
+        <div style="font-size:0.75rem; font-weight:600; color:var(--teal); margin-bottom:0.3rem">Trace Events</div>
+        <div style="font-size:0.72rem; color:var(--muted)"><code>{node, status, timing_ms}</code><br>&rarr; <code>setCurrentTrace()</code><br>&rarr; live AgentTrace badges</div>
+      </div>
+      <div style="flex:1; min-width:140px; padding:0.5rem; border-right:1px solid var(--border)">
+        <div style="font-size:0.75rem; font-weight:600; color:var(--amber); margin-bottom:0.3rem">Answer Chunks</div>
+        <div style="font-size:0.72rem; color:var(--muted)"><code>{text}</code><br>&rarr; <code>setCurrentAnswer()</code><br>&rarr; streaming preview text</div>
+      </div>
+      <div style="flex:1; min-width:140px; padding:0.5rem; border-right:1px solid var(--border)">
+        <div style="font-size:0.75rem; font-weight:600; color:var(--green); margin-bottom:0.3rem">Complete Response</div>
+        <div style="font-size:0.72rem; color:var(--muted)"><code>AgentResponse</code><br>&rarr; <code>setMessages()</code><br>&rarr; full MessageBubble</div>
+      </div>
+      <div style="flex:1; min-width:140px; padding:0.5rem;">
+        <div style="font-size:0.75rem; font-weight:600; color:var(--rose); margin-bottom:0.3rem">Error Events</div>
+        <div style="font-size:0.72rem; color:var(--muted)"><code>{message, recoverable}</code><br>&rarr; <code>setError()</code><br>&rarr; retry button UI</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box b-green">
+      <h4 style="color:var(--green)">4. MessageBubble Renders</h4>
+      <p>Conditionally renders sub-components based on <code>response_data</code> properties: intent badge &rarr; AgentTrace &rarr; Markdown answer &rarr; SqlViewer &rarr; ResultsTable &rarr; ChartView &rarr; Citations</p>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── useChat State ───────── -->
+<div class="section">
+  <div class="section-title">useChat Hook &mdash; State Management</div>
+  <div class="state-grid">
+    <div class="state-item">
+      <div class="name">messages</div>
+      <div class="stype">ChatMessage[]</div>
+      <div class="sdesc">Full conversation history</div>
+    </div>
+    <div class="state-item">
+      <div class="name">isStreaming</div>
+      <div class="stype">boolean</div>
+      <div class="sdesc">Active SSE connection</div>
+    </div>
+    <div class="state-item">
+      <div class="name">currentTrace</div>
+      <div class="stype">TraceEvent[]</div>
+      <div class="sdesc">Live agent node execution</div>
+    </div>
+    <div class="state-item">
+      <div class="name">currentAnswer</div>
+      <div class="stype">string</div>
+      <div class="sdesc">Accumulated streaming text</div>
+    </div>
+    <div class="state-item">
+      <div class="name">error</div>
+      <div class="stype">string | null</div>
+      <div class="sdesc">Error message display</div>
+    </div>
+    <div class="state-item">
+      <div class="name">abortControllerRef</div>
+      <div class="stype">Ref&lt;AbortController&gt;</div>
+      <div class="sdesc">Cancel inflight requests</div>
+    </div>
+    <div class="state-item">
+      <div class="name">lastQueryRef</div>
+      <div class="stype">Ref&lt;string&gt;</div>
+      <div class="sdesc">Retry support</div>
+    </div>
+    <div class="state-item">
+      <div class="name">conversationIdRef</div>
+      <div class="stype">Ref&lt;string&gt;</div>
+      <div class="sdesc">UUID per session</div>
+    </div>
+  </div>
+  <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:center">
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.6rem 1rem; font-size:0.8rem;">
+      <strong style="color:var(--accent)">sendMessage</strong> <span style="color:var(--muted)">&mdash; initiate SSE stream</span>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.6rem 1rem; font-size:0.8rem;">
+      <strong style="color:var(--rose)">cancelStream</strong> <span style="color:var(--muted)">&mdash; abort controller</span>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.6rem 1rem; font-size:0.8rem;">
+      <strong style="color:var(--amber)">retry</strong> <span style="color:var(--muted)">&mdash; resend last query</span>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.6rem 1rem; font-size:0.8rem;">
+      <strong style="color:var(--green)">clearError</strong> <span style="color:var(--muted)">&mdash; dismiss error</span>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── Type Interfaces ───────── -->
+<div class="section">
+  <div class="section-title">Core Type Interfaces (api.ts)</div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr><th>Interface</th><th>Key Fields</th><th>Used By</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ChatMessage</td>
+        <td><span class="type">role: 'user'|'assistant'</span>, <span class="type">content: string</span>, <span class="type">response_data?: AgentResponse</span></td>
+        <td>useChat &rarr; MessageBubble</td>
+      </tr>
+      <tr>
+        <td>AgentResponse</td>
+        <td><span class="type">intent</span>, <span class="type">answer</span>, <span class="type">sql?</span>, <span class="type">query_results?</span>, <span class="type">chart_type?</span>, <span class="type">citations?</span>, <span class="type">agent_trace</span>, <span class="type">timing_ms?</span></td>
+        <td>MessageBubble &rarr; sub-components</td>
+      </tr>
+      <tr>
+        <td>TraceEvent</td>
+        <td><span class="type">node: string</span>, <span class="type">status: 'running'|'complete'|'error'</span>, <span class="type">timing_ms?: number</span></td>
+        <td>AgentTrace</td>
+      </tr>
+      <tr>
+        <td>Citation</td>
+        <td><span class="type">text: string</span>, <span class="type">page?: number</span>, <span class="type">doc_name?: string</span>, <span class="type">score?: number</span></td>
+        <td>Citations</td>
+      </tr>
+      <tr>
+        <td>ConfigResponse</td>
+        <td><span class="type">llm_provider</span>, <span class="type">rag_engine</span>, <span class="type">demo_mode</span>, <span class="type">model_id</span></td>
+        <td>Layout footer</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ───────── Components Detail ───────── -->
+<div class="section">
+  <div class="section-title">Component Details</div>
+  <div class="cards">
+    <div class="card b-blue">
+      <h3><span style="color:var(--accent)">&#9672;</span> ChatPanel</h3>
+      <ul>
+        <li class="dot-blue">Consumes entire <code>useChat</code> hook</li>
+        <li class="dot-blue">Auto-resizing textarea (Enter send, Shift+Enter newline)</li>
+        <li class="dot-blue">Suggested query buttons (pre-seeded)</li>
+        <li class="dot-blue">Renders live streaming trace + preview during SSE</li>
+        <li class="dot-blue">Cancel button while streaming, retry on error</li>
+        <li class="dot-blue">Auto-scrolls to bottom on new messages</li>
+      </ul>
+    </div>
+    <div class="card b-purple">
+      <h3><span style="color:var(--purple)">&#9672;</span> MessageBubble</h3>
+      <ul>
+        <li class="dot-purple">Intent badge: nl2sql (blue), rag (green), clarify (amber)</li>
+        <li class="dot-purple">Timing display + SQL retry count</li>
+        <li class="dot-purple">ReactMarkdown with remark-gfm for answer text</li>
+        <li class="dot-purple">Conditionally renders sub-components by data presence</li>
+      </ul>
+    </div>
+    <div class="card b-teal">
+      <h3><span style="color:var(--teal)">&#9672;</span> AgentTrace</h3>
+      <ul>
+        <li class="dot-teal">Renders node execution as colored badges</li>
+        <li class="dot-teal">Status icons: spinner (running), check (complete), x (error)</li>
+        <li class="dot-teal">Timing display in ms per node</li>
+        <li class="dot-teal">Used both live (streaming) and historical (in messages)</li>
+      </ul>
+    </div>
+    <div class="card b-amber">
+      <h3><span style="color:var(--amber)">&#9672;</span> SqlViewer</h3>
+      <ul>
+        <li class="dot-amber">Collapsible SQL code block</li>
+        <li class="dot-amber">Copy-to-clipboard button</li>
+        <li class="dot-amber">Props: <code>sql: string</code></li>
+      </ul>
+    </div>
+    <div class="card b-green">
+      <h3><span style="color:var(--green)">&#9672;</span> ResultsTable</h3>
+      <ul>
+        <li class="dot-green">Dynamic columns from object keys</li>
+        <li class="dot-green">Sortable column headers (asc/desc)</li>
+        <li class="dot-green">Max 50 rows displayed with count indicator</li>
+        <li class="dot-green">Props: <code>data: Record&lt;string, unknown&gt;[]</code></li>
+      </ul>
+    </div>
+    <div class="card b-rose">
+      <h3><span style="color:var(--rose)">&#9672;</span> ChartView</h3>
+      <ul>
+        <li class="dot-blue">Recharts: BarChart, LineChart, or PieChart</li>
+        <li class="dot-blue">XAxis = 1st column, YAxis = 2nd column</li>
+        <li class="dot-blue">Max 20 data points, 300px responsive container</li>
+        <li class="dot-blue">Props: <code>data</code> + <code>chartType: 'bar'|'line'|'pie'</code></li>
+      </ul>
+    </div>
+    <div class="card b-teal">
+      <h3><span style="color:var(--teal)">&#9672;</span> Citations</h3>
+      <ul>
+        <li class="dot-teal">Expandable source list with count</li>
+        <li class="dot-teal">Shows doc_name, page number, relevance score</li>
+        <li class="dot-teal">Expand individual citation for full text</li>
+        <li class="dot-teal">Props: <code>citations: Citation[]</code></li>
+      </ul>
+    </div>
+    <div class="card b-amber">
+      <h3><span style="color:var(--amber)">&#9672;</span> UploadPanel</h3>
+      <ul>
+        <li class="dot-amber">Drag-and-drop zone + file picker</li>
+        <li class="dot-amber">Routes .csv &rarr; <code>uploadCSV()</code>, .pdf &rarr; <code>uploadPDF()</code></li>
+        <li class="dot-amber">Success/error toast notifications</li>
+        <li class="dot-amber">Displays loaded datasets + indexed documents</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── API Client ───────── -->
+<div class="section">
+  <div class="section-title">API Client Functions (api.ts)</div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr><th>Function</th><th>Method</th><th>Endpoint</th><th>Returns</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>fetchHealth()</td><td>GET</td><td>/api/health</td><td>HealthResponse</td></tr>
+      <tr><td>fetchConfig()</td><td>GET</td><td>/api/config</td><td>ConfigResponse</td></tr>
+      <tr><td>fetchSchema()</td><td>GET</td><td>/api/schema</td><td>Schema JSON</td></tr>
+      <tr><td>sendChat()</td><td>POST</td><td>/api/chat</td><td>AgentResponse</td></tr>
+      <tr><td>uploadCSV()</td><td>POST</td><td>/api/upload/csv</td><td>UploadResponse</td></tr>
+      <tr><td>uploadPDF()</td><td>POST</td><td>/api/upload/pdf</td><td>UploadResponse</td></tr>
+      <tr><td>fetchDatasets()</td><td>GET</td><td>/api/datasets</td><td>Dataset list</td></tr>
+      <tr><td>fetchDocuments()</td><td>GET</td><td>/api/documents</td><td>Document list</td></tr>
+      <tr><td>fetchChatHistory()</td><td>GET</td><td>/api/chat/history/{id}</td><td>ChatMessage[]</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ───────── Patterns ───────── -->
+<div class="section">
+  <div class="section-title">Design Patterns</div>
+  <div class="cards" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+    <div class="card b-blue">
+      <h3 style="font-size:0.85rem">Hooks-Only State</h3>
+      <p>No Redux/Zustand &mdash; useState + useRef + useCallback. All state local to components or lifted via useChat.</p>
+    </div>
+    <div class="card b-green">
+      <h3 style="font-size:0.85rem">Conditional Rendering</h3>
+      <p>MessageBubble renders sub-components only when matching data exists in AgentResponse (sql, results, citations).</p>
+    </div>
+    <div class="card b-purple">
+      <h3 style="font-size:0.85rem">ReadableStream SSE</h3>
+      <p>Fetch API + ReadableStream + TextDecoder for chunked JSON parsing. AbortController for cancellation.</p>
+    </div>
+    <div class="card b-amber">
+      <h3 style="font-size:0.85rem">Demo Mode</h3>
+      <p>DEMO_MESSAGES pre-loaded into useChat on init. Shows NL2SQL + RAG examples without requiring a backend.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">BCBS Claims AI &mdash; Frontend Architecture &mdash; React + Vite + TypeScript</div>
+
+</div>
+</body>
+</html>

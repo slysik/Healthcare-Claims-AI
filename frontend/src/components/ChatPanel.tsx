@@ -7,9 +7,9 @@ import AgentTrace from './AgentTrace'
 const SUGGESTED_QUERIES = [
   'What are total charges by claim status?',
   'Which providers have denied claims?',
+  'Show claims by member',
   'What is the deductible for this plan?',
   'Is telehealth covered under this plan?',
-  'Show claims by member',
 ]
 
 export default function ChatPanel() {

@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BCBS Claims AI - System Architecture</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --border: #475569;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --rose: #fb7185;
+    --teal: #2dd4bf;
+    --purple: #a78bfa;
+    --orange: #fb923c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 1.1em;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+
+  /* ── Main Architecture Diagram ── */
+  .arch-diagram {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    max-width: 1100px;
+    margin: 0 auto 3rem;
+  }
+
+  .layer {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    background: var(--surface);
+    position: relative;
+  }
+
+  .layer-label {
+    position: absolute;
+    top: -0.6em;
+    left: 1.25rem;
+    background: var(--surface);
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  .component-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .component {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    min-width: 140px;
+    text-align: center;
+    transition: transform 0.15s, border-color 0.15s;
+    cursor: default;
+  }
+  .component:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+  .component .name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+  .component .tech {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+  .component .file {
+    font-size: 0.65rem;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    margin-top: 0.25rem;
+    opacity: 0.8;
+  }
+
+  /* Color-coded borders */
+  .c-blue   { border-left: 3px solid var(--accent); }
+  .c-purple { border-left: 3px solid var(--purple); }
+  .c-green  { border-left: 3px solid var(--green); }
+  .c-amber  { border-left: 3px solid var(--amber); }
+  .c-rose   { border-left: 3px solid var(--rose); }
+  .c-teal   { border-left: 3px solid var(--teal); }
+  .c-orange { border-left: 3px solid var(--orange); }
+
+  /* ── Flow Arrow ── */
+  .flow-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.25rem 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    gap: 0.5rem;
+  }
+  .flow-arrow .arrow {
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+
+  /* ── Agent Flow (Horizontal) ── */
+  .agent-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto 3rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .agent-node {
+    flex: 1;
+    min-width: 130px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 0.75rem;
+    text-align: center;
+    position: relative;
+  }
+  .agent-node .node-num {
+    position: absolute;
+    top: -0.5em;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 0.65rem;
+    font-weight: 700;
+    width: 1.4em;
+    height: 1.4em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .agent-node .node-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+  }
+  .agent-node .node-desc {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .agent-connector {
+    display: flex;
+    align-items: center;
+    padding: 0 0.15rem;
+    color: var(--border);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .branch-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1.5;
+    min-width: 180px;
+  }
+  .branch-option {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .branch-option .tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.15em 0.5em;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .tag-sql { background: rgba(56,189,248,0.2); color: var(--accent); }
+  .tag-rag { background: rgba(45,212,191,0.2); color: var(--teal); }
+  .tag-clarify { background: rgba(251,191,36,0.2); color: var(--amber); }
+
+  /* ── Tech Stack Table ── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+    max-width: 1100px;
+    margin: 0 auto 3rem;
+  }
+
+  .tech-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .tech-card .category {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+  }
+  .tech-card .tech-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .tech-card .tech-detail {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+  }
+
+  /* ── Data Flow ── */
+  .data-flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    max-width: 1100px;
+    margin: 0 auto 3rem;
+    justify-content: center;
+  }
+
+  .flow-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    flex: 1;
+    min-width: 280px;
+    max-width: 520px;
+  }
+  .flow-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .flow-steps {
+    list-style: none;
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  .flow-steps li {
+    position: relative;
+    padding: 0.4rem 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .flow-steps li::before {
+    content: '';
+    position: absolute;
+    left: -1.15rem;
+    top: 0.75rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+  }
+  .flow-steps li::after {
+    content: '';
+    position: absolute;
+    left: -0.82rem;
+    top: 1.5rem;
+    width: 2px;
+    height: calc(100% - 0.6rem);
+    background: var(--border);
+  }
+  .flow-steps li:last-child::after { display: none; }
+  .flow-steps li strong { color: var(--text); }
+
+  /* ── API Endpoints ── */
+  .api-section {
+    max-width: 1100px;
+    margin: 0 auto 3rem;
+  }
+  .api-group {
+    margin-bottom: 1rem;
+  }
+  .api-group h3 {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  .endpoint-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .endpoint {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.82rem;
+  }
+  .method {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.15em 0.5em;
+    border-radius: 3px;
+    flex-shrink: 0;
+    min-width: 3em;
+    text-align: center;
+  }
+  .method-get  { background: rgba(74,222,128,0.2); color: var(--green); }
+  .method-post { background: rgba(56,189,248,0.2); color: var(--accent); }
+  .endpoint .path {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    color: var(--text);
+    font-size: 0.8rem;
+  }
+  .endpoint .desc {
+    color: var(--text-muted);
+    margin-left: auto;
+    font-size: 0.75rem;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── Skills Alignment ── */
+  .skills-banner {
+    max-width: 1100px;
+    margin: 0 auto 2.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .skills-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--green), var(--teal));
+  }
+  .skills-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .skills-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .skills-score {
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .score-badge {
+    background: rgba(74,222,128,0.15);
+    border: 1px solid rgba(74,222,128,0.3);
+    color: var(--green);
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+  }
+  .score-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  @media (max-width: 700px) { .skills-grid { grid-template-columns: 1fr; } }
+  .skill-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    background: var(--surface2);
+    font-size: 0.8rem;
+  }
+  .skill-row .skill-status {
+    flex-shrink: 0;
+    width: 1.2em;
+    height: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+  }
+  .skill-row .skill-name {
+    font-weight: 600;
+    color: var(--text);
+    min-width: 0;
+  }
+  .skill-row .skill-where {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    margin-left: auto;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .skill-type {
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .type-req { background: rgba(56,189,248,0.2); color: var(--accent); }
+  .type-nice { background: rgba(167,139,250,0.2); color: var(--accent2); }
+  .type-bonus { background: rgba(74,222,128,0.2); color: var(--green); }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    body { padding: 1rem; }
+    .agent-flow { flex-direction: column; align-items: stretch; }
+    .agent-connector { justify-content: center; transform: rotate(90deg); padding: 0.25rem 0; }
+    .component { min-width: 110px; }
+    .endpoint .desc { display: none; }
+    .skill-row .skill-where { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>BCBS Claims AI</h1>
+<p class="subtitle">Intelligent Healthcare Claims Assistant &mdash; System Architecture Overview</p>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SKILLS ALIGNMENT -->
+<!-- ════════════════════════════════════════════ -->
+
+<div class="skills-banner">
+  <div class="skills-header">
+    <h2>BCBS SC AI Agentic Engineer &mdash; Skills Alignment</h2>
+    <div class="skills-score">
+      <div class="score-badge">10/10 Required</div>
+      <div class="score-badge" style="background:rgba(129,140,248,0.15); border-color:rgba(129,140,248,0.3); color:var(--accent2);">4/4 Nice-to-Have</div>
+      <div class="score-badge" style="background:rgba(74,222,128,0.1); border-color:rgba(74,222,128,0.25); color:var(--green); font-size:0.75rem; font-weight:500;">+ 2 Bonus</div>
+    </div>
+  </div>
+  <div class="skills-grid">
+    <!-- Required -->
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">LangChain + LangGraph</span>
+      <span class="skill-where">6-node StateGraph agent</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">Claude / LLMs</span>
+      <span class="skill-where">Anthropic + Bedrock switchable</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">Agentic AI (reasoning, tool use)</span>
+      <span class="skill-where">Routing + self-correction loop</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">Prompt Engineering</span>
+      <span class="skill-where">5 prompt templates, NL2SQL gen</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">Cloud (AWS preferred)</span>
+      <span class="skill-where">Bedrock, S3, DynamoDB, IAM</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">Docker &amp; Kubernetes</span>
+      <span class="skill-where">docker-compose, health checks</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">Document Databases</span>
+      <span class="skill-where">DynamoDB conversations</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">JavaScript / TypeScript</span>
+      <span class="skill-where">React + Vite + typed API client</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">RESTful API Development</span>
+      <span class="skill-where">FastAPI, 10 endpoints, Swagger</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#10003;</span>
+      <span class="skill-type type-req">REQ</span>
+      <span class="skill-name">Production-Grade AI</span>
+      <span class="skill-where">SSE streaming, error recovery</span>
+    </div>
+    <!-- Nice-to-Have -->
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--accent2)">&#10003;</span>
+      <span class="skill-type type-nice">N2H</span>
+      <span class="skill-name">FastAPI or Flask</span>
+      <span class="skill-where">Async FastAPI + lifespan + CORS</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--accent2)">&#10003;</span>
+      <span class="skill-type type-nice">N2H</span>
+      <span class="skill-name">RAG, Embeddings, Knowledge Stores</span>
+      <span class="skill-where">BM25 + ChromaDB dual engine</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--accent2)">&#10003;</span>
+      <span class="skill-type type-nice">N2H</span>
+      <span class="skill-name">Adaptable Architecture</span>
+      <span class="skill-where">Switchable LLM, RAG, storage</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--accent2)">&#10003;</span>
+      <span class="skill-type type-nice">N2H</span>
+      <span class="skill-name">Error Recovery</span>
+      <span class="skill-where">SQL self-correction, fallbacks</span>
+    </div>
+    <!-- Bonus -->
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#9733;</span>
+      <span class="skill-type type-bonus">BONUS</span>
+      <span class="skill-name">SQL Self-Correction</span>
+      <span class="skill-where">Auto-fix + retry with LLM</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-status" style="color:var(--green)">&#9733;</span>
+      <span class="skill-type type-bonus">BONUS</span>
+      <span class="skill-name">Dual RAG Engine</span>
+      <span class="skill-where">BM25 (demo) / ChromaDB (prod)</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SYSTEM LAYERS -->
+<!-- ════════════════════════════════════════════ -->
+
+<div class="section-title">System Layers</div>
+
+<div class="arch-diagram">
+
+  <!-- Frontend Layer -->
+  <div class="layer">
+    <span class="layer-label">Frontend &mdash; React + Vite + TypeScript + Tailwind</span>
+    <div class="component-grid">
+      <div class="component c-blue">
+        <div class="name">Layout</div>
+        <div class="tech">Header + Tab Navigation</div>
+        <div class="file">Layout.tsx</div>
+      </div>
+      <div class="component c-blue">
+        <div class="name">ChatPanel</div>
+        <div class="tech">SSE Streaming Chat UI</div>
+        <div class="file">ChatPanel.tsx</div>
+      </div>
+      <div class="component c-blue">
+        <div class="name">MessageBubble</div>
+        <div class="tech">Rich Message Rendering</div>
+        <div class="file">MessageBubble.tsx</div>
+      </div>
+      <div class="component c-blue">
+        <div class="name">UploadPanel</div>
+        <div class="tech">Drag &amp; Drop CSV/PDF</div>
+        <div class="file">UploadPanel.tsx</div>
+      </div>
+      <div class="component c-purple">
+        <div class="name">AgentTrace</div>
+        <div class="tech">Live Node Visualization</div>
+        <div class="file">AgentTrace.tsx</div>
+      </div>
+      <div class="component c-purple">
+        <div class="name">ResultsTable</div>
+        <div class="tech">Sortable Data Table</div>
+        <div class="file">ResultsTable.tsx</div>
+      </div>
+      <div class="component c-purple">
+        <div class="name">ChartView</div>
+        <div class="tech">Recharts (Bar/Line/Pie)</div>
+        <div class="file">ChartView.tsx</div>
+      </div>
+      <div class="component c-purple">
+        <div class="name">SqlViewer</div>
+        <div class="tech">Collapsible SQL Display</div>
+        <div class="file">SqlViewer.tsx</div>
+      </div>
+      <div class="component c-purple">
+        <div class="name">Citations</div>
+        <div class="tech">RAG Source References</div>
+        <div class="file">Citations.tsx</div>
+      </div>
+      <div class="component c-teal">
+        <div class="name">useChat</div>
+        <div class="tech">SSE Hook + State Mgmt</div>
+        <div class="file">hooks/useChat.ts</div>
+      </div>
+      <div class="component c-teal">
+        <div class="name">API Client</div>
+        <div class="tech">Typed Fetch Wrapper</div>
+        <div class="file">lib/api.ts</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">
+    <span class="arrow">&darr;</span> SSE (text/event-stream) <span class="arrow">&darr;</span>
+  </div>
+
+  <!-- Backend Layer -->
+  <div class="layer">
+    <span class="layer-label">Backend &mdash; FastAPI + Python 3.12</span>
+    <div class="component-grid">
+      <div class="component c-green">
+        <div class="name">FastAPI App</div>
+        <div class="tech">CORS, Lifespan, Health</div>
+        <div class="file">app/main.py</div>
+      </div>
+      <div class="component c-green">
+        <div class="name">Config</div>
+        <div class="tech">Pydantic Settings</div>
+        <div class="file">app/config.py</div>
+      </div>
+      <div class="component c-amber">
+        <div class="name">Chat Router</div>
+        <div class="tech">SSE Streaming Endpoint</div>
+        <div class="file">routers/chat.py</div>
+      </div>
+      <div class="component c-amber">
+        <div class="name">Upload Router</div>
+        <div class="tech">CSV/PDF Ingestion</div>
+        <div class="file">routers/upload.py</div>
+      </div>
+      <div class="component c-amber">
+        <div class="name">Data Router</div>
+        <div class="tech">Health, Schema, Config</div>
+        <div class="file">routers/data.py</div>
+      </div>
+      <div class="component c-rose">
+        <div class="name">Schemas</div>
+        <div class="tech">Pydantic Models</div>
+        <div class="file">models/schemas.py</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">
+    <span class="arrow">&darr;</span> Invokes Agent <span class="arrow">&darr;</span>
+  </div>
+
+  <!-- Agent Layer -->
+  <div class="layer" style="border-color: var(--accent2);">
+    <span class="layer-label" style="color: var(--accent2);">Agent &mdash; LangGraph State Machine</span>
+    <div class="component-grid">
+      <div class="component c-rose">
+        <div class="name">StateGraph</div>
+        <div class="tech">LangGraph Orchestrator</div>
+        <div class="file">agent/graph.py</div>
+      </div>
+      <div class="component c-rose">
+        <div class="name">AgentState</div>
+        <div class="tech">TypedDict State Schema</div>
+        <div class="file">agent/state.py</div>
+      </div>
+      <div class="component c-rose">
+        <div class="name">Node Functions</div>
+        <div class="tech">6 Nodes (classify &rarr; synth)</div>
+        <div class="file">agent/nodes.py</div>
+      </div>
+      <div class="component c-rose">
+        <div class="name">Prompts</div>
+        <div class="tech">System Prompts per Node</div>
+        <div class="file">agent/prompts.py</div>
+      </div>
+      <div class="component c-rose">
+        <div class="name">LLM Factory</div>
+        <div class="tech">Anthropic / Bedrock Switch</div>
+        <div class="file">agent/llm.py</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">
+    <span class="arrow">&darr;</span> Queries Services <span class="arrow">&darr;</span>
+  </div>
+
+  <!-- Services Layer -->
+  <div class="layer">
+    <span class="layer-label">Services &mdash; Data &amp; Storage</span>
+    <div class="component-grid">
+      <div class="component c-teal">
+        <div class="name">DuckDB Manager</div>
+        <div class="tech">In-Process Analytics DB</div>
+        <div class="file">services/database.py</div>
+      </div>
+      <div class="component c-teal">
+        <div class="name">Storage Service</div>
+        <div class="tech">S3 + Local Parquet</div>
+        <div class="file">services/storage.py</div>
+      </div>
+      <div class="component c-teal">
+        <div class="name">VectorStore</div>
+        <div class="tech">BM25 / ChromaDB Dual Engine</div>
+        <div class="file">services/vectorstore.py</div>
+      </div>
+      <div class="component c-teal">
+        <div class="name">Conversations</div>
+        <div class="tech">DynamoDB / In-Memory</div>
+        <div class="file">services/conversations.py</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">
+    <span class="arrow">&darr;</span> External Dependencies <span class="arrow">&darr;</span>
+  </div>
+
+  <!-- External Layer -->
+  <div class="layer" style="border-style: dashed;">
+    <span class="layer-label">External &mdash; Optional AWS (Free Tier)</span>
+    <div class="component-grid">
+      <div class="component c-orange">
+        <div class="name">Claude LLM</div>
+        <div class="tech">Anthropic API (direct)</div>
+      </div>
+      <div class="component c-orange">
+        <div class="name">AWS Bedrock</div>
+        <div class="tech">Claude via AWS (alt)</div>
+      </div>
+      <div class="component c-orange">
+        <div class="name">S3</div>
+        <div class="tech">Parquet Storage (opt)</div>
+      </div>
+      <div class="component c-orange">
+        <div class="name">DynamoDB</div>
+        <div class="tech">Conversation Persist (opt)</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- AGENT FLOW -->
+<!-- ════════════════════════════════════════════ -->
+
+<div class="section-title">LangGraph Agent Flow</div>
+
+<div class="agent-flow">
+  <div class="agent-node">
+    <span class="node-num">1</span>
+    <div class="node-name">classify_intent</div>
+    <div class="node-desc">Determines query type: data analytics, policy question, or clarification needed</div>
+  </div>
+  <div class="agent-connector">&rarr;</div>
+  <div class="branch-box">
+    <div class="branch-option">
+      <span class="tag tag-sql">NL2SQL</span>
+      <span>generate_sql &rarr; execute_query &rarr; (fix_sql on error)</span>
+    </div>
+    <div class="branch-option">
+      <span class="tag tag-rag">RAG</span>
+      <span>search_docs &rarr; retrieve chunks with citations</span>
+    </div>
+    <div class="branch-option">
+      <span class="tag tag-clarify">CLARIFY</span>
+      <span>Ask user for more information</span>
+    </div>
+  </div>
+  <div class="agent-connector">&rarr;</div>
+  <div class="agent-node">
+    <span class="node-num">6</span>
+    <div class="node-name">synthesize</div>
+    <div class="node-desc">Formats final response with SQL, charts, citations, and agent trace metadata</div>
+  </div>
+  <div class="agent-connector">&rarr;</div>
+  <div class="agent-node" style="border-color: var(--green);">
+    <span class="node-num" style="background: var(--green);">&#10003;</span>
+    <div class="node-name">END</div>
+    <div class="node-desc">Stream complete response via SSE to client</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- DATA FLOW -->
+<!-- ════════════════════════════════════════════ -->
+
+<div class="section-title">Data Flow Paths</div>
+
+<div class="data-flow">
+  <div class="flow-card" style="border-left: 3px solid var(--accent);">
+    <h3><span style="color:var(--accent);">&#9672;</span> NL2SQL Path</h3>
+    <ol class="flow-steps">
+      <li><strong>User asks a data question</strong> (e.g., "Top 5 diagnosis codes?")</li>
+      <li><strong>classify_intent</strong> routes to NL2SQL</li>
+      <li><strong>generate_sql</strong> &mdash; Claude writes DuckDB SQL</li>
+      <li><strong>execute_query</strong> &mdash; runs against 1,000 claims</li>
+      <li>On error: <strong>fix_sql</strong> self-corrects (max retries configurable)</li>
+      <li><strong>synthesize</strong> &mdash; returns table + chart type (bar/line/pie)</li>
+    </ol>
+  </div>
+
+  <div class="flow-card" style="border-left: 3px solid var(--teal);">
+    <h3><span style="color:var(--teal);">&#9672;</span> RAG Path</h3>
+    <ol class="flow-steps">
+      <li><strong>User asks a policy question</strong> (e.g., "What's the deductible?")</li>
+      <li><strong>classify_intent</strong> routes to RAG</li>
+      <li><strong>search_docs</strong> &mdash; BM25 or ChromaDB retrieval</li>
+      <li>Chunks from <strong>10-page benefits PDF</strong> with page metadata</li>
+      <li><strong>synthesize</strong> &mdash; answer with source citations</li>
+    </ol>
+  </div>
+
+  <div class="flow-card" style="border-left: 3px solid var(--amber);">
+    <h3><span style="color:var(--amber);">&#9672;</span> Upload Path</h3>
+    <ol class="flow-steps">
+      <li><strong>User uploads CSV</strong> via drag-and-drop</li>
+      <li><strong>upload router</strong> validates and converts to Parquet</li>
+      <li><strong>DuckDB</strong> loads new table for querying</li>
+      <li><strong>User uploads PDF</strong> for RAG</li>
+      <li><strong>VectorStore</strong> chunks and indexes document</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- API ENDPOINTS -->
+<!-- ════════════════════════════════════════════ -->
+
+<div class="section-title">API Endpoints</div>
+
+<div class="api-section">
+  <div class="api-group">
+    <h3>Chat</h3>
+    <div class="endpoint-list">
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="path">/api/chat/stream</span>
+        <span class="desc">SSE streaming chat (primary)</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="path">/api/chat</span>
+        <span class="desc">Non-streaming fallback</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="path">/api/chat/history/{id}</span>
+        <span class="desc">Conversation history</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-group">
+    <h3>Upload</h3>
+    <div class="endpoint-list">
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="path">/api/upload/csv</span>
+        <span class="desc">CSV &rarr; Parquet &rarr; DuckDB</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="path">/api/upload/pdf</span>
+        <span class="desc">PDF &rarr; RAG engine ingestion</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="path">/api/datasets</span>
+        <span class="desc">List loaded datasets</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="path">/api/documents</span>
+        <span class="desc">List ingested documents</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-group">
+    <h3>System</h3>
+    <div class="endpoint-list">
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="path">/api/health</span>
+        <span class="desc">Service health check</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="path">/api/config</span>
+        <span class="desc">Feature flags &amp; settings</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="path">/api/schema</span>
+        <span class="desc">DuckDB table schemas</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TECH STACK -->
+<!-- ════════════════════════════════════════════ -->
+
+<div class="section-title">Technology Stack</div>
+
+<div class="tech-grid">
+  <div class="tech-card">
+    <div class="category">Agent Framework</div>
+    <div class="tech-name">LangChain + LangGraph</div>
+    <div class="tech-detail">Stateful agent orchestration with conditional routing</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">LLM</div>
+    <div class="tech-name">Claude (Sonnet 4.5)</div>
+    <div class="tech-detail">Anthropic API or AWS Bedrock provider</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">Backend</div>
+    <div class="tech-name">FastAPI + Python 3.12</div>
+    <div class="tech-detail">Async web framework with UV package manager</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">Frontend</div>
+    <div class="tech-name">React + Vite + TypeScript</div>
+    <div class="tech-detail">Tailwind CSS + shadcn/ui components</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">Analytics DB</div>
+    <div class="tech-name">DuckDB</div>
+    <div class="tech-detail">In-process OLAP database for SQL queries</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">RAG Engine</div>
+    <div class="tech-name">BM25 / ChromaDB</div>
+    <div class="tech-detail">Dual engine: lightweight or production vector search</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">Data Format</div>
+    <div class="tech-name">Parquet</div>
+    <div class="tech-detail">Columnar storage, local or S3-backed</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">Streaming</div>
+    <div class="tech-name">Server-Sent Events</div>
+    <div class="tech-detail">Real-time token streaming with heartbeat keepalive</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">Charting</div>
+    <div class="tech-name">Recharts</div>
+    <div class="tech-detail">Bar, line, and pie charts for query results</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">Containers</div>
+    <div class="tech-name">Docker + Compose</div>
+    <div class="tech-detail">Backend + nginx-alpine frontend, health checks</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">Cloud (Optional)</div>
+    <div class="tech-name">AWS Free Tier</div>
+    <div class="tech-detail">S3, DynamoDB, Bedrock &mdash; all optional</div>
+  </div>
+  <div class="tech-card">
+    <div class="category">Conversation Store</div>
+    <div class="tech-name">DynamoDB / In-Memory</div>
+    <div class="tech-detail">Persistent or ephemeral conversation history</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ════════════════════════════════════════════ -->
+
+<div class="footer">
+  BCBS Claims AI &mdash; Built by Steve Lysik for BCBS SC AI Agentic Engineer &mdash; February 2026
+</div>
+
+</body>
+</html>

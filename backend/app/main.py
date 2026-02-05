@@ -24,39 +24,50 @@ async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     logger.info("Starting BCBS Claims AI Backend")
 
-    # Auto-load sample data
+    import re
+
+    # Auto-load data from data directory
     data_dir = Path(settings.DATA_DIR)
-    sample_csv = data_dir / "sample_claims.csv"
-    sample_pdf = data_dir / "bcbs_benefits_summary.pdf"
 
     status_lines = []
     status_lines.append("=" * 60)
     status_lines.append("BCBS Claims AI - Startup Status")
     status_lines.append("=" * 60)
 
-    # Load CSV if present
-    if sample_csv.exists():
+    # Load all CSV files
+    csv_files = sorted(data_dir.glob("*.csv"))
+    for csv_path in csv_files:
         try:
-            row_count = db_manager.load_csv(sample_csv, "claims")
-            status_lines.append(f"✓ Loaded {row_count} claims from {sample_csv.name}")
+            table_name = re.sub(r"[^a-zA-Z0-9_]", "_", csv_path.stem)
+            row_count = db_manager.load_csv(csv_path, table_name)
+            status_lines.append(f"✓ Loaded {row_count} rows from {csv_path.name} → {table_name}")
         except Exception as e:
-            status_lines.append(f"✗ Failed to load CSV: {e}")
-    else:
-        status_lines.append(f"⊗ Sample CSV not found: {sample_csv}")
+            status_lines.append(f"✗ Failed to load {csv_path.name}: {e}")
 
-    # Ingest PDF if present
-    if sample_pdf.exists():
+    # Load all Parquet files
+    parquet_files = sorted(data_dir.glob("*.parquet"))
+    for parquet_path in parquet_files:
         try:
-            chunk_count = retriever_manager.ingest_pdf(
-                sample_pdf, "bcbs_benefits_summary"
-            )
-            status_lines.append(
-                f"✓ Ingested {chunk_count} chunks from {sample_pdf.name}"
-            )
+            table_name = re.sub(r"[^a-zA-Z0-9_]", "_", parquet_path.stem)
+            row_count = db_manager.load_parquet(parquet_path, table_name)
+            status_lines.append(f"✓ Loaded {row_count} rows from {parquet_path.name} → {table_name}")
         except Exception as e:
-            status_lines.append(f"✗ Failed to ingest PDF: {e}")
-    else:
-        status_lines.append(f"⊗ Sample PDF not found: {sample_pdf}")
+            status_lines.append(f"✗ Failed to load {parquet_path.name}: {e}")
+
+    if not csv_files and not parquet_files:
+        status_lines.append("⊗ No CSV or Parquet files found in data/")
+
+    # Ingest all PDF files
+    pdf_files = sorted(data_dir.glob("*.pdf"))
+    for pdf_path in pdf_files:
+        try:
+            chunk_count = retriever_manager.ingest_pdf(pdf_path, pdf_path.name)
+            status_lines.append(f"✓ Ingested {chunk_count} chunks from {pdf_path.name}")
+        except Exception as e:
+            status_lines.append(f"✗ Failed to ingest {pdf_path.name}: {e}")
+
+    if not pdf_files:
+        status_lines.append("⊗ No PDF files found in data/")
 
     # Configuration summary
     status_lines.append("")

@@ -32,12 +32,18 @@ SQL_GENERATION_PROMPT = """You are an expert at writing DuckDB SQL queries
 for healthcare claims analysis.
 
 CRITICAL RULES:
-1. Table name is 'claims'
+1. Check the schema below for the EXACT table name and column names — do NOT
+   guess or assume column names. Use ONLY what appears in the schema.
 2. Use DuckDB SQL dialect
-3. ALWAYS use single quotes for string literals (not double quotes)
-4. Use proper date functions: strftime(), DATE_TRUNC(), etc.
+3. ALWAYS use double quotes for column names that contain spaces (e.g. "Claim Status")
+4. ALWAYS use single quotes for string literal values (e.g. 'DENIED')
 5. For aggregations, always include appropriate GROUP BY clauses
 6. Use descriptive column aliases for readability
+7. Dollar amount columns may be stored as VARCHAR with '$' prefix — cast them:
+   CAST(REPLACE(REPLACE("Total Charges", '$', ''), ',', '') AS DECIMAL(10,2))
+8. Date columns may be stored as VARCHAR (e.g. 'March 3 2025') — use
+   CAST("Beginning Date of Service" AS DATE) or strftime for date operations
+9. String comparisons are CASE-SENSITIVE — use exact values from sample data
 
 Database schema:
 {schema}
@@ -51,13 +57,14 @@ Generate a single SQL query that answers this question. Return ONLY the
 SQL query, optionally wrapped in ```sql markdown code blocks.
 
 Common patterns:
-- Time series: SELECT DATE_TRUNC('month', service_date) as month,
-  COUNT(*) FROM claims GROUP BY month ORDER BY month
-- Top categories: SELECT diagnosis_code, diagnosis_desc, COUNT(*) as count
-  FROM claims GROUP BY diagnosis_code, diagnosis_desc ORDER BY count DESC LIMIT 10
-- Aggregates: SELECT provider_name, SUM(billed_amount) as total FROM claims
-  GROUP BY provider_name
-- Filtering: WHERE service_date >= '2025-01-01' AND status = 'PAID'
+- By status: SELECT "Claim Status", COUNT(*) as claim_count,
+  SUM(CAST(REPLACE(REPLACE("Total Charges", '$', ''), ',', '') AS DECIMAL(10,2))) as total
+  FROM table_name GROUP BY "Claim Status"
+- By provider: SELECT "Provider", COUNT(*) as claim_count
+  FROM table_name GROUP BY "Provider" ORDER BY claim_count DESC
+- By member: SELECT "Member", COUNT(*) as claim_count
+  FROM table_name GROUP BY "Member" ORDER BY claim_count DESC
+- Filtering: WHERE "Claim Status" = 'DENIED'
 """
 
 SQL_FIX_PROMPT = """The following SQL query produced an error.
@@ -73,8 +80,10 @@ Database schema:
 {schema}
 
 CRITICAL:
-- Use single quotes for strings
-- Verify column names exist in schema
+- Use double quotes for column names with spaces (e.g. "Claim Status")
+- Use single quotes for string literal values (e.g. 'DENIED')
+- Verify column names exist in schema — use EXACT names
+- Dollar columns are VARCHAR with '$' — cast with REPLACE/CAST
 - Check date format and functions
 - Ensure proper GROUP BY for aggregations
 

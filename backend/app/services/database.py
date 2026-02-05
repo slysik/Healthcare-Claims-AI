@@ -66,8 +66,16 @@ class DatabaseManager:
                 logger.warning(f"Could not get schema for {table_name}: {e}")
         return "\n\n".join(schemas) if schemas else "No tables loaded."
 
-    def get_sample_data(self, table_name: str = "claims", limit: int = 5) -> str:
-        """Get sample rows formatted for prompt context."""
+    def get_sample_data(self, table_name: str | None = None, limit: int = 5) -> str:
+        """Get sample rows formatted for prompt context.
+
+        If table_name is None, uses the first loaded table.
+        """
+        if table_name is None:
+            if not self._tables:
+                return "No sample data available."
+            table_name = next(iter(self._tables))
+
         try:
             result = self.conn.execute(f"SELECT * FROM {table_name} LIMIT {limit}")
             columns = [desc[0] for desc in result.description]

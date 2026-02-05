@@ -18,33 +18,35 @@ interface UseChatReturn {
 const DEMO_MESSAGES: ChatMessage[] = [
   {
     role: 'user',
-    content: 'What are the top 5 diagnosis codes by claim count?',
+    content: 'What are total charges by claim status?',
     timestamp: new Date(Date.now() - 120000).toISOString(),
   },
   {
     role: 'assistant',
-    content: `Based on the claims data, here are the top 5 diagnosis codes by claim
-count:
+    content: `Here's a breakdown of total charges by claim status:
 
-1. **E11.9** - Type 2 diabetes without complications (342 claims)
-2. **I10** - Essential hypertension (289 claims)
-3. **M79.3** - Nonspecific back pain (267 claims)
-4. **J45.909** - Unspecified asthma (234 claims)
-5. **F41.1** - Generalized anxiety disorder (198 claims)
+| Claim Status | Claim Count | Total Charges |
+|---|---|---|
+| PROCESSED | 14 | $10,271.35 |
+| DENIED | 4 | $485.00 |
 
-These conditions represent the most common diagnoses in our claims database.`,
+14 of 18 claims were processed successfully, totaling $10,271.35. The 4 denied claims total $485.00 — 3 from Lowcountry Urology Clinics PA and 1 from Medical Select Inc.`,
     response_data: {
       intent: 'nl2sql',
-      answer: `Based on the claims data, here are the top 5 diagnosis codes by claim
-count:
+      answer: `Here's a breakdown of total charges by claim status:
 
-1. **E11.9** - Type 2 diabetes without complications (342 claims)
-2. **I10** - Essential hypertension (289 claims)
-3. **M79.3** - Nonspecific back pain (267 claims)
-4. **J45.909** - Unspecified asthma (234 claims)
-5. **F41.1** - Generalized anxiety disorder (198 claims)
+| Claim Status | Claim Count | Total Charges |
+|---|---|---|
+| PROCESSED | 14 | $10,271.35 |
+| DENIED | 4 | $485.00 |
 
-These conditions represent the most common diagnoses in our claims database.`,
+14 of 18 claims were processed successfully, totaling $10,271.35. The 4 denied claims total $485.00 — 3 from Lowcountry Urology Clinics PA and 1 from Medical Select Inc.`,
+      sql: 'SELECT "Claim Status", COUNT(*) as claim_count, SUM(CAST(REPLACE(REPLACE("Total Charges", \'$\', \'\'), \',\', \'\') AS DECIMAL(10,2))) as total_charges FROM HealthClaimsList_Feb24_Feb26 GROUP BY "Claim Status" ORDER BY total_charges DESC',
+      query_results: [
+        { 'Claim Status': 'PROCESSED', claim_count: 14, total_charges: 10271.35 },
+        { 'Claim Status': 'DENIED', claim_count: 4, total_charges: 485.00 },
+      ],
+      chart_type: 'bar' as const,
       agent_trace: [],
       timing_ms: 1245,
     },
@@ -52,31 +54,36 @@ These conditions represent the most common diagnoses in our claims database.`,
   },
   {
     role: 'user',
-    content: 'What is the deductible for in-network services?',
+    content: 'What is the deductible for this plan?',
     timestamp: new Date(Date.now() - 60000).toISOString(),
   },
   {
     role: 'assistant',
-    content: `According to the plan documents, the **in-network annual deductible is
-$1,500 for individual coverage and $3,000 for family coverage**.
+    content: `Based on the Summary of Benefits Coverage, the overall deductible for this plan is:
 
-After meeting your deductible, you'll pay coinsurance (typically 20%) for most
-covered services. Some preventive services are covered at 100% with no deductible.`,
+- **Individual**: $7,900
+- **Family**: $15,800
+
+You must pay all costs from providers up to the deductible amount before the plan begins to pay. However, **preventive care services and office visits are covered before you meet your deductible**.
+
+The maximum out-of-pocket limit is **$9,500/individual** and **$19,000/family**.`,
     response_data: {
       intent: 'rag',
-      answer: `According to the plan documents, the **in-network annual deductible is
-$1,500 for individual coverage and $3,000 for family coverage**.
+      answer: `Based on the Summary of Benefits Coverage, the overall deductible for this plan is:
 
-After meeting your deductible, you'll pay coinsurance (typically 20%) for most
-covered services. Some preventive services are covered at 100% with no deductible.`,
+- **Individual**: $7,900
+- **Family**: $15,800
+
+You must pay all costs from providers up to the deductible amount before the plan begins to pay. However, **preventive care services and office visits are covered before you meet your deductible**.
+
+The maximum out-of-pocket limit is **$9,500/individual** and **$19,000/family**.`,
       agent_trace: [],
       timing_ms: 876,
       citations: [
         {
-          text: 'Individual deductible: $1,500. Family deductible: $3,000. ' +
-                'In-network services only.',
-          page: 3,
-          doc_name: 'benefits_summary.pdf',
+          text: 'What is the overall deductible? $7,900/individual and $15,800/family. Generally, you must pay all the costs from providers up to the deductible amount before this plan begins to pay.',
+          page: 1,
+          doc_name: 'Summary of Benefits Coverage.pdf',
           score: 0.89,
         },
       ],
