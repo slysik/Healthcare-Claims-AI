@@ -1,0 +1,38 @@
+# Environment and secrets
+.env
+.env.local
+
+# Data files (may contain PHI/PII)
+data/*.csv
+data/*.parquet
+data/*.pdf
+data/*.json
+!data/generate_claims.py
+!data/generate_benefits_pdf.py
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+*.log
+
+# DuckDB
+*.duckdb
+*.duckdb.wal
