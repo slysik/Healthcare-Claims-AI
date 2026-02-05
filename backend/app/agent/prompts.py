@@ -41,8 +41,10 @@ CRITICAL RULES:
 6. Use descriptive column aliases for readability
 7. Dollar amount columns may be stored as VARCHAR with '$' prefix — cast them:
    CAST(REPLACE(REPLACE("Total Charges", '$', ''), ',', '') AS DECIMAL(10,2))
-8. Date columns may be stored as VARCHAR (e.g. 'March 3 2025') — use
-   CAST("Beginning Date of Service" AS DATE) or strftime for date operations
+8. Date columns are stored as VARCHAR in 'Month Day Year' format (e.g. 'December 5 2025').
+   To parse dates, use: strptime("Beginning Date of Service", '%B %-d %Y')
+   To sort by date: ORDER BY strptime("Beginning Date of Service", '%B %-d %Y') DESC
+   Do NOT use CAST(... AS DATE) — it will fail on this format.
 9. String comparisons are CASE-SENSITIVE — use exact values from sample data
 
 Database schema:
@@ -87,8 +89,10 @@ CRITICAL:
 - Use single quotes for string literal values (e.g. 'DENIED')
 - Verify column names exist in schema — use EXACT names
 - Dollar columns are VARCHAR with '$' — cast with REPLACE/CAST
-- Check date format and functions
+- Date columns are VARCHAR in 'Month Day Year' format (e.g. 'December 5 2025').
+  Use strptime("Beginning Date of Service", '%B %-d %Y') — NOT CAST AS DATE
 - Ensure proper GROUP BY for aggregations
+- Use UPPER() or ILIKE for case-insensitive string matching
 
 Return ONLY the corrected SQL query, optionally wrapped in
 ```sql markdown blocks.

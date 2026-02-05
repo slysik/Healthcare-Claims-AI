@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     RAG_ENGINE: str = "bm25"  # "bm25" or "chroma"
 
     # Agent tuning
-    SQL_MAX_RETRIES: int = 1
+    SQL_MAX_RETRIES: int = 2
 
     # Demo mode
     DEMO_MODE: bool = True

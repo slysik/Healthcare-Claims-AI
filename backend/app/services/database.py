@@ -5,6 +5,7 @@ import duckdb
 
 logger = logging.getLogger(__name__)
 
+
 class DatabaseManager:
     """DuckDB in-memory database manager."""
 
@@ -43,13 +44,27 @@ class DatabaseManager:
         logger.info(f"Loaded {count} rows from {path} into {table_name}")
         return count
 
+    @staticmethod
+    def _sanitize_value(val):
+        """Convert non-JSON-serializable types (Decimal, datetime, etc.) to primitives."""
+        from datetime import date, datetime
+        from decimal import Decimal
+
+        if isinstance(val, Decimal):
+            return float(val)
+        if isinstance(val, (datetime, date)):
+            return val.isoformat()
+        return val
+
     def execute_query(self, sql: str) -> list[dict]:
         """Execute SQL query and return results as list of dicts."""
         try:
             result = self.conn.execute(sql)
             columns = [desc[0] for desc in result.description]
             rows = result.fetchall()
-            return [dict(zip(columns, row)) for row in rows]
+            return [
+                {col: self._sanitize_value(val) for col, val in zip(columns, row)} for row in rows
+            ]
         except Exception as e:
             raise RuntimeError(f"SQL execution error: {str(e)}") from e
 
