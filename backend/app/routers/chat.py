@@ -32,11 +32,11 @@ CANNED_RESPONSES = {
             "and 1 from Medical Select Inc."
         ),
         sql=(
-            "SELECT \"Claim Status\", COUNT(*) as claim_count, "
+            'SELECT "Claim Status", COUNT(*) as claim_count, '
             "SUM(CAST(REPLACE(REPLACE(\"Total Charges\", '$', ''), ',', '') AS DECIMAL(10,2))) "
             "as total_charges "
             "FROM HealthClaimsList_Feb24_Feb26 "
-            "GROUP BY \"Claim Status\" ORDER BY total_charges DESC"
+            'GROUP BY "Claim Status" ORDER BY total_charges DESC'
         ),
         query_results=[
             {
@@ -66,12 +66,12 @@ CANNED_RESPONSES = {
             "all for Steve Lysik. The Medical Select denial was $35 for Noelle Lysik."
         ),
         sql=(
-            "SELECT \"Provider\", COUNT(*) as denied_count, "
+            'SELECT "Provider", COUNT(*) as denied_count, '
             "SUM(CAST(REPLACE(REPLACE(\"Total Charges\", '$', ''), ',', '') AS DECIMAL(10,2))) "
             "as total_denied "
             "FROM HealthClaimsList_Feb24_Feb26 "
             "WHERE \"Claim Status\" = 'DENIED' "
-            "GROUP BY \"Provider\" ORDER BY denied_count DESC"
+            'GROUP BY "Provider" ORDER BY denied_count DESC'
         ),
         query_results=[
             {
@@ -88,6 +88,61 @@ CANNED_RESPONSES = {
         chart_type="bar",
         agent_trace=[],
         timing_ms=150,
+    ),
+    "claims by member": AgentResponse(
+        intent="nl2sql",
+        answer=(
+            "Here's a breakdown of claims by member:\n\n"
+            "| Member | Claim Count | Total Charges | Paid by Plan |\n"
+            "|---|---|---|---|\n"
+            "| NOELLE LYSIK | 11 | $9,446.43 | $459.53 |\n"
+            "| STEVE LYSIK | 7 | $1,309.92 | $112.43 |\n\n"
+            "Noelle has 11 claims totaling $9,446.43 with $459.53 paid by the plan. "
+            "Steve has 7 claims totaling $1,309.92 with $112.43 paid by the plan."
+        ),
+        sql=(
+            'SELECT "Member", COUNT(*) as claim_count, '
+            "SUM(CAST(REPLACE(REPLACE(\"Total Charges\", '$', ''), ',', '') AS DECIMAL(10,2))) as total_charges, "
+            "SUM(CAST(REPLACE(REPLACE(\"Amount Paid by Plan\", '$', ''), ',', '') AS DECIMAL(10,2))) as paid_by_plan "
+            "FROM HealthClaimsList_Feb24_Feb26 "
+            'GROUP BY "Member" ORDER BY total_charges DESC'
+        ),
+        query_results=[
+            {
+                "Member": "NOELLE LYSIK",
+                "claim_count": 11,
+                "total_charges": 9446.43,
+                "paid_by_plan": 459.53,
+            },
+            {
+                "Member": "STEVE LYSIK",
+                "claim_count": 7,
+                "total_charges": 1309.92,
+                "paid_by_plan": 112.43,
+            },
+        ],
+        chart_type="bar",
+        agent_trace=[],
+        timing_ms=150,
+    ),
+    "telehealth": AgentResponse(
+        intent="rag",
+        answer=(
+            "Yes, **telehealth/telemedicine services are covered** under this plan.\n\n"
+            "According to the Summary of Benefits Coverage, telehealth visits are treated "
+            "the same as office visits. You'll pay the applicable copay or coinsurance "
+            "depending on whether the provider is in-network or out-of-network.\n\n"
+            "This includes virtual consultations with physicians and specialists."
+        ),
+        citations=[
+            {
+                "text": ("Telehealth services are covered under office visit benefits."),
+                "page": 2,
+                "doc_name": "Summary of Benefits Coverage.pdf",
+            },
+        ],
+        agent_trace=[],
+        timing_ms=120,
     ),
     "what is the deductible": AgentResponse(
         intent="rag",
@@ -188,9 +243,7 @@ async def _stream_canned_response(response: AgentResponse, request: Request):
     }
 
 
-async def _stream_agent_response(
-    query: str, conversation_history: list[dict], request: Request
-):
+async def _stream_agent_response(query: str, conversation_history: list[dict], request: Request):
     """Stream live agent execution with trace events."""
     start_time = time.time()
     trace_events = []

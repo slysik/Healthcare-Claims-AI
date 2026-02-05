@@ -14,86 +14,8 @@ interface UseChatReturn {
   clearError: () => void
 }
 
-// Demo conversation to show on first load
-const DEMO_MESSAGES: ChatMessage[] = [
-  {
-    role: 'user',
-    content: 'What are total charges by claim status?',
-    timestamp: new Date(Date.now() - 120000).toISOString(),
-  },
-  {
-    role: 'assistant',
-    content: `Here's a breakdown of total charges by claim status:
-
-| Claim Status | Claim Count | Total Charges |
-|---|---|---|
-| PROCESSED | 14 | $10,271.35 |
-| DENIED | 4 | $485.00 |
-
-14 of 18 claims were processed successfully, totaling $10,271.35. The 4 denied claims total $485.00 — 3 from Lowcountry Urology Clinics PA and 1 from Medical Select Inc.`,
-    response_data: {
-      intent: 'nl2sql',
-      answer: `Here's a breakdown of total charges by claim status:
-
-| Claim Status | Claim Count | Total Charges |
-|---|---|---|
-| PROCESSED | 14 | $10,271.35 |
-| DENIED | 4 | $485.00 |
-
-14 of 18 claims were processed successfully, totaling $10,271.35. The 4 denied claims total $485.00 — 3 from Lowcountry Urology Clinics PA and 1 from Medical Select Inc.`,
-      sql: 'SELECT "Claim Status", COUNT(*) as claim_count, SUM(CAST(REPLACE(REPLACE("Total Charges", \'$\', \'\'), \',\', \'\') AS DECIMAL(10,2))) as total_charges FROM HealthClaimsList_Feb24_Feb26 GROUP BY "Claim Status" ORDER BY total_charges DESC',
-      query_results: [
-        { 'Claim Status': 'PROCESSED', claim_count: 14, total_charges: 10271.35 },
-        { 'Claim Status': 'DENIED', claim_count: 4, total_charges: 485.00 },
-      ],
-      chart_type: 'bar' as const,
-      agent_trace: [],
-      timing_ms: 1245,
-    },
-    timestamp: new Date(Date.now() - 110000).toISOString(),
-  },
-  {
-    role: 'user',
-    content: 'What is the deductible for this plan?',
-    timestamp: new Date(Date.now() - 60000).toISOString(),
-  },
-  {
-    role: 'assistant',
-    content: `Based on the Summary of Benefits Coverage, the overall deductible for this plan is:
-
-- **Individual**: $7,900
-- **Family**: $15,800
-
-You must pay all costs from providers up to the deductible amount before the plan begins to pay. However, **preventive care services and office visits are covered before you meet your deductible**.
-
-The maximum out-of-pocket limit is **$9,500/individual** and **$19,000/family**.`,
-    response_data: {
-      intent: 'rag',
-      answer: `Based on the Summary of Benefits Coverage, the overall deductible for this plan is:
-
-- **Individual**: $7,900
-- **Family**: $15,800
-
-You must pay all costs from providers up to the deductible amount before the plan begins to pay. However, **preventive care services and office visits are covered before you meet your deductible**.
-
-The maximum out-of-pocket limit is **$9,500/individual** and **$19,000/family**.`,
-      agent_trace: [],
-      timing_ms: 876,
-      citations: [
-        {
-          text: 'What is the overall deductible? $7,900/individual and $15,800/family. Generally, you must pay all the costs from providers up to the deductible amount before this plan begins to pay.',
-          page: 1,
-          doc_name: 'Summary of Benefits Coverage.pdf',
-          score: 0.89,
-        },
-      ],
-    },
-    timestamp: new Date(Date.now() - 55000).toISOString(),
-  },
-]
-
 export function useChat(): UseChatReturn {
-  const [messages, setMessages] = useState<ChatMessage[]>(DEMO_MESSAGES)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
   const [currentTrace, setCurrentTrace] = useState<TraceEvent[]>([])
   const [currentAnswer, setCurrentAnswer] = useState('')

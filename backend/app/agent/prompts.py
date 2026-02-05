@@ -56,14 +56,17 @@ User question: {query}
 Generate a single SQL query that answers this question. Return ONLY the
 SQL query, optionally wrapped in ```sql markdown code blocks.
 
-Common patterns:
+IMPORTANT: Use the EXACT table name from the schema above. Do NOT use
+placeholder names like "table_name" or "claims".
+
+Common patterns (replace <TABLE> with the actual table name from schema):
 - By status: SELECT "Claim Status", COUNT(*) as claim_count,
   SUM(CAST(REPLACE(REPLACE("Total Charges", '$', ''), ',', '') AS DECIMAL(10,2))) as total
-  FROM table_name GROUP BY "Claim Status"
+  FROM <TABLE> GROUP BY "Claim Status"
 - By provider: SELECT "Provider", COUNT(*) as claim_count
-  FROM table_name GROUP BY "Provider" ORDER BY claim_count DESC
+  FROM <TABLE> GROUP BY "Provider" ORDER BY claim_count DESC
 - By member: SELECT "Member", COUNT(*) as claim_count
-  FROM table_name GROUP BY "Member" ORDER BY claim_count DESC
+  FROM <TABLE> GROUP BY "Member" ORDER BY claim_count DESC
 - Filtering: WHERE "Claim Status" = 'DENIED'
 """
 
