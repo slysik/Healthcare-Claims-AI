@@ -42,30 +42,30 @@ export default function ResultsTable({ data }: Props) {
   if (data.length === 0) return null
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
+    <div className="ring-1 ring-bcbs-100 rounded-xl overflow-hidden shadow-sm">
       <div className="overflow-x-auto max-h-80">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 sticky top-0">
+          <thead className="bg-bcbs-50 sticky top-0">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col}
                   onClick={() => handleSort(col)}
-                  className="px-3 py-2 text-left font-medium text-gray-600 cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+                  className="px-3 py-2 text-left font-medium text-bcbs-700 cursor-pointer hover:bg-bcbs-100 transition-colors duration-150 whitespace-nowrap text-xs sm:text-sm"
                 >
                   <div className="flex items-center gap-1">
                     {col}
-                    <ArrowUpDown className="h-3 w-3 text-gray-400" />
+                    <ArrowUpDown className="h-3 w-3 text-bcbs-300" />
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-bcbs-100/50">
             {sortedData.map((row, idx) => (
-              <tr key={idx} className="hover:bg-gray-50">
+              <tr key={idx} className="hover:bg-bcbs-50/50 transition-colors duration-150">
                 {columns.map((col) => (
-                  <td key={col} className="px-3 py-1.5 whitespace-nowrap text-gray-700">
+                  <td key={col} className="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs sm:text-sm">
                     {row[col] != null ? String(row[col]) : '—'}
                   </td>
                 ))}
@@ -75,7 +75,7 @@ export default function ResultsTable({ data }: Props) {
         </table>
       </div>
       {data.length > 50 && (
-        <div className="px-3 py-1.5 bg-gray-50 text-xs text-gray-500 border-t">
+        <div className="px-3 py-1.5 bg-bcbs-50 text-xs text-bcbs-500 border-t border-bcbs-100">
           Showing 50 of {data.length} rows
         </div>
       )}

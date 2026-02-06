@@ -3,8 +3,27 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --bcbs-50: #EFF6FF;
+    --bcbs-100: #DBEAFE;
+    --bcbs-200: #BFDBFE;
+    --bcbs-300: #93C5FD;
+    --bcbs-400: #60A5FA;
+    --bcbs-500: #0057B8;
+    --bcbs-600: #003D82;
+    --bcbs-700: #002D6B;
+    --bcbs-800: #001E4D;
+    --bcbs-900: #001233;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-gray-50 text-gray-900 antialiased font-sans;
+  }
+}
+
+@layer components {
+  .transition-panel {
+    @apply transition-all duration-200 ease-out;
   }
 }
 
@@ -13,13 +32,13 @@
   @apply w-full border-collapse text-sm;
 }
 .prose th {
-  @apply bg-gray-100 border border-gray-200 px-3 py-2 text-left font-semibold;
+  @apply bg-bcbs-50 border border-bcbs-100 px-3 py-2 text-left font-semibold text-bcbs-700;
 }
 .prose td {
-  @apply border border-gray-200 px-3 py-2;
+  @apply border border-bcbs-100 px-3 py-2;
 }
 .prose tr:nth-child(even) {
-  @apply bg-gray-50;
+  @apply bg-bcbs-50/50;
 }
 
 /* Scrollbar styles */
@@ -30,5 +49,5 @@
   @apply bg-transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
+  @apply bg-bcbs-200 rounded-full hover:bg-bcbs-300;
 }

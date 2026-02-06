@@ -8,7 +8,9 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-      {activeTab === 'chat' ? <ChatPanel /> : <UploadPanel />}
+      <div key={activeTab} className="animate-fadeIn h-full">
+        {activeTab === 'chat' ? <ChatPanel /> : <UploadPanel />}
+      </div>
     </Layout>
   )
 }

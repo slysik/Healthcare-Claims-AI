@@ -67,14 +67,14 @@ export default function ChatPanel() {
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto">
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-8 space-y-5">
         {messages.length === 0 && !isStreaming && (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <Sparkles className="h-12 w-12 text-bcbs-blue/30 mb-4" />
-            <h2 className="text-lg font-semibold text-gray-700 mb-2">
+            <Sparkles className="h-16 w-16 text-bcbs-400/40 mb-4" />
+            <h2 className="text-xl font-semibold text-bcbs-800 mb-2">
               BCBS Claims AI
             </h2>
-            <p className="text-sm text-gray-500 mb-6 max-w-md">
+            <p className="text-sm text-bcbs-600/70 mb-6 max-w-md">
               Query claims data with natural language, search policy documents,
               or get answers about plan benefits.
             </p>
@@ -83,7 +83,7 @@ export default function ChatPanel() {
                 <button
                   key={query}
                   onClick={() => handleSuggestionClick(query)}
-                  className="text-sm px-3 py-1.5 rounded-full border border-bcbs-blue/20 text-bcbs-blue hover:bg-bcbs-blue/5 transition-colors"
+                  className="text-sm px-3 py-1.5 rounded-full border border-bcbs-200 text-bcbs-600 shadow-sm ring-1 ring-bcbs-200 hover:ring-bcbs-300 hover:shadow-md hover:bg-bcbs-50 transition-all duration-200"
                 >
                   {query}
                 </button>
@@ -106,7 +106,7 @@ export default function ChatPanel() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="prose prose-sm max-w-none">
                   {currentAnswer}
-                  <span className="inline-block w-0.5 h-4 bg-bcbs-blue animate-pulse ml-0.5 align-middle" />
+                  <span className="inline-block w-0.5 h-4 bg-bcbs-500 animate-pulse ml-0.5 align-middle" />
                 </div>
               </div>
             )}
@@ -114,9 +114,9 @@ export default function ChatPanel() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center gap-2 text-gray-400">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-bcbs-blue/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-bcbs-blue/40 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-bcbs-blue/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-bcbs-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-bcbs-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-bcbs-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                   <span className="text-sm">Thinking...</span>
                 </div>
@@ -158,7 +158,7 @@ export default function ChatPanel() {
               <button
                 key={query}
                 onClick={() => handleSuggestionClick(query)}
-                className="text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 whitespace-nowrap flex-shrink-0"
+                className="text-xs px-3 py-1 rounded-full border border-bcbs-200 text-bcbs-600 hover:bg-bcbs-50 transition-all duration-200 whitespace-nowrap flex-shrink-0"
               >
                 {query}
               </button>
@@ -168,7 +168,7 @@ export default function ChatPanel() {
       )}
 
       {/* Input area */}
-      <div className="border-t border-gray-200 bg-white p-4">
+      <div className="border-t border-bcbs-100 bg-white p-3 sm:p-4 shadow-sm">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <textarea
             ref={inputRef}
@@ -176,7 +176,7 @@ export default function ChatPanel() {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="Ask about claims data or plan benefits..."
-            className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-bcbs-blue/50 focus:border-bcbs-blue text-sm resize-none max-h-32 min-h-[42px]"
+            className="flex-1 px-4 py-2.5 rounded-lg border border-bcbs-200 focus:outline-none focus:ring-2 focus:ring-bcbs-300 focus:border-bcbs-400 text-sm resize-none max-h-32 min-h-[42px]"
             disabled={isStreaming}
             rows={1}
           />
@@ -184,7 +184,7 @@ export default function ChatPanel() {
             <button
               type="button"
               onClick={cancelStream}
-              className="px-4 py-2.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+              className="px-4 py-2.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors min-h-[48px] sm:min-h-0"
               title="Cancel"
             >
               <Square className="h-4 w-4" />
@@ -193,7 +193,7 @@ export default function ChatPanel() {
             <button
               type="submit"
               disabled={!input.trim()}
-              className="px-4 py-2.5 rounded-lg bg-bcbs-blue text-white hover:bg-bcbs-blue-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-bcbs-500 to-bcbs-600 text-white hover:from-bcbs-600 hover:to-bcbs-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm min-h-[48px] sm:min-h-0"
             >
               <Send className="h-4 w-4" />
             </button>

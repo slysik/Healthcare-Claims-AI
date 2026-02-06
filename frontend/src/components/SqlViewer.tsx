@@ -16,12 +16,12 @@ export default function SqlViewer({ sql }: Props) {
   }
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
+    <div className="ring-1 ring-bcbs-100 rounded-xl overflow-hidden shadow-sm">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 transition-colors text-sm"
+        className="w-full flex items-center justify-between px-3 py-2 bg-bcbs-50 hover:bg-bcbs-100 transition-all duration-200 text-sm"
       >
-        <div className="flex items-center gap-2 text-gray-600">
+        <div className="flex items-center gap-2 text-bcbs-600">
           {isOpen ? (
             <ChevronDown className="h-4 w-4" />
           ) : (
@@ -35,7 +35,7 @@ export default function SqlViewer({ sql }: Props) {
               e.stopPropagation()
               handleCopy()
             }}
-            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600"
+            className="flex items-center gap-1 text-xs text-bcbs-400 hover:text-bcbs-600"
           >
             {copied ? (
               <>
@@ -52,7 +52,7 @@ export default function SqlViewer({ sql }: Props) {
         )}
       </button>
       {isOpen && (
-        <pre className="px-3 py-2 text-xs bg-gray-900 text-green-400 overflow-x-auto">
+        <pre className="px-3 py-2 text-xs bg-slate-900 text-green-400 overflow-x-auto rounded-b-xl">
           <code>{sql}</code>
         </pre>
       )}

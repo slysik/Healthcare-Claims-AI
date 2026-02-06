@@ -26,10 +26,10 @@ export default function AgentTrace({ events }: Props) {
             <div
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
                 event.status === 'running'
-                  ? 'bg-bcbs-blue/10 text-bcbs-blue border border-bcbs-blue/20 animate-pulse'
+                  ? 'bg-bcbs-50 text-bcbs-600 ring-1 ring-bcbs-200 animate-pulse'
                   : event.status === 'complete'
-                  ? 'bg-green-50 text-green-700 border border-green-200'
-                  : 'bg-red-50 text-red-700 border border-red-200'
+                  ? 'bg-green-50 text-green-700 ring-1 ring-green-200'
+                  : 'bg-red-50 text-red-700 ring-1 ring-red-200'
               }`}
             >
               {event.status === 'running' ? (
@@ -49,7 +49,7 @@ export default function AgentTrace({ events }: Props) {
               )}
             </div>
             {!isLast && (
-              <div className="w-3 h-px bg-gray-300" />
+              <div className="w-3 h-px bg-bcbs-200" />
             )}
           </div>
         )

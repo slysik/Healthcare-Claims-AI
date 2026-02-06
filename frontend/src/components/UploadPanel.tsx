@@ -70,20 +70,20 @@ export default function UploadPanel() {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={() => setIsDragging(false)}
-        className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+        className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
           isDragging
-            ? 'border-bcbs-blue bg-bcbs-blue/5'
-            : 'border-gray-300 hover:border-gray-400'
+            ? 'border-bcbs-500 bg-bcbs-50'
+            : 'border-bcbs-200 hover:border-bcbs-300'
         }`}
       >
-        <Upload className={`h-10 w-10 mx-auto mb-3 ${isDragging ? 'text-bcbs-blue' : 'text-gray-400'}`} />
-        <p className="text-sm font-medium text-gray-700 mb-1">
+        <Upload className={`h-10 w-10 mx-auto mb-3 ${isDragging ? 'text-bcbs-500' : 'text-bcbs-300'}`} />
+        <p className="text-sm font-medium text-bcbs-800 mb-1">
           {uploading ? 'Uploading...' : 'Drop a CSV or PDF file here'}
         </p>
-        <p className="text-xs text-gray-500 mb-4">
+        <p className="text-xs text-bcbs-500/70 mb-4">
           CSV files load into DuckDB for queries. PDF files are indexed for search.
         </p>
-        <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-bcbs-blue text-white text-sm font-medium hover:bg-bcbs-blue-dark cursor-pointer transition-colors">
+        <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-bcbs-500 to-bcbs-600 text-white text-sm font-medium hover:from-bcbs-600 hover:to-bcbs-700 cursor-pointer transition-all duration-200">
           <Upload className="h-4 w-4" />
           Browse files
           <input
@@ -103,8 +103,8 @@ export default function UploadPanel() {
       {status && (
         <div className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm ${
           status.type === 'success'
-            ? 'bg-green-50 text-green-700 border border-green-200'
-            : 'bg-red-50 text-red-700 border border-red-200'
+            ? 'bg-green-50 text-green-700 ring-1 ring-green-200'
+            : 'bg-red-50 text-red-700 ring-1 ring-red-200'
         }`}>
           {status.type === 'success' ? (
             <CheckCircle className="h-4 w-4 flex-shrink-0" />
@@ -116,31 +116,31 @@ export default function UploadPanel() {
       )}
 
       {/* Loaded data info */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-white ring-1 ring-bcbs-100 shadow-sm rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <Database className="h-5 w-5 text-bcbs-blue" />
+            <Database className="h-5 w-5 text-bcbs-500" />
             <h3 className="font-medium text-sm">Datasets</h3>
           </div>
           {datasets ? (
-            <pre className="text-xs text-gray-600 overflow-auto max-h-40">
+            <pre className="text-xs text-bcbs-700 overflow-auto max-h-40">
               {JSON.stringify(datasets, null, 2)}
             </pre>
           ) : (
-            <p className="text-xs text-gray-400">No datasets loaded</p>
+            <p className="text-xs text-bcbs-400 italic">No datasets loaded</p>
           )}
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <div className="bg-white ring-1 ring-bcbs-100 shadow-sm rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
             <FileText className="h-5 w-5 text-green-600" />
             <h3 className="font-medium text-sm">Documents</h3>
           </div>
           {documents ? (
-            <pre className="text-xs text-gray-600 overflow-auto max-h-40">
+            <pre className="text-xs text-bcbs-700 overflow-auto max-h-40">
               {JSON.stringify(documents, null, 2)}
             </pre>
           ) : (
-            <p className="text-xs text-gray-400">No documents indexed</p>
+            <p className="text-xs text-bcbs-400 italic">No documents indexed</p>
           )}
         </div>
       </div>

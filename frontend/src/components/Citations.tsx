@@ -11,10 +11,10 @@ export default function Citations({ citations }: Props) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null)
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
+    <div className="ring-1 ring-bcbs-100 rounded-xl overflow-hidden shadow-sm">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center gap-2 px-3 py-2 bg-green-50 hover:bg-green-100 transition-colors text-sm text-green-700"
+        className="w-full flex items-center gap-2 px-3 py-2 bg-bcbs-50 hover:bg-bcbs-100 transition-all duration-200 text-sm text-bcbs-600"
       >
         {isOpen ? (
           <ChevronDown className="h-4 w-4" />
@@ -27,7 +27,7 @@ export default function Citations({ citations }: Props) {
         </span>
       </button>
       {isOpen && (
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-bcbs-100/50">
           {citations.map((citation, idx) => (
             <div key={idx} className="px-3 py-2">
               <button
@@ -35,19 +35,19 @@ export default function Citations({ citations }: Props) {
                 className="w-full text-left"
               >
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+                  <span className="text-xs font-mono bg-bcbs-50 px-1.5 py-0.5 rounded text-bcbs-600">
                     {citation.doc_name || 'Document'}
                     {citation.page != null ? ` p.${citation.page}` : ''}
                   </span>
                   {citation.score != null && (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-bcbs-400">
                       {(citation.score * 100).toFixed(0)}% match
                     </span>
                   )}
                 </div>
               </button>
               {expandedIdx === idx && (
-                <p className="mt-1 text-xs text-gray-600 bg-gray-50 rounded p-2">
+                <p className="mt-1 text-xs text-bcbs-700 bg-bcbs-50 rounded-lg p-2">
                   {citation.text}
                 </p>
               )}

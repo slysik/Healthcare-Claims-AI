@@ -3,7 +3,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
 
-const COLORS = ['#0057B8', '#003D82', '#4A90D9', '#7AB8F5', '#B3D7FF', '#E8F0FE']
+const COLORS = ['#0057B8', '#003D82', '#60A5FA', '#93C5FD', '#BFDBFE', '#DBEAFE']
 
 interface Props {
   data: Record<string, unknown>[]
@@ -28,7 +28,7 @@ export default function ChartView({ data, chartType }: Props) {
       case 'bar':
         return (
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#DBEAFE" />
             <XAxis dataKey={xKey} tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
@@ -39,7 +39,7 @@ export default function ChartView({ data, chartType }: Props) {
       case 'line':
         return (
           <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#DBEAFE" />
             <XAxis dataKey={xKey} tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
@@ -71,7 +71,7 @@ export default function ChartView({ data, chartType }: Props) {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
+    <div className="bg-white ring-1 ring-bcbs-100 shadow-sm rounded-xl p-4">
       <ResponsiveContainer width="100%" height={300}>
         {renderChart()}
       </ResponsiveContainer>

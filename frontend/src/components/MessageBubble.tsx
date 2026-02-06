@@ -15,7 +15,7 @@ export default function MessageBubble({ message }: Props) {
   if (message.role === 'user') {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[80%] bg-bcbs-blue text-white rounded-2xl rounded-br-md px-4 py-2.5">
+        <div className="max-w-[80%] bg-gradient-to-br from-bcbs-500 to-bcbs-600 text-white rounded-2xl rounded-br-md px-4 py-2.5 shadow-md">
           <p className="text-sm">{message.content}</p>
         </div>
       </div>
@@ -32,15 +32,15 @@ export default function MessageBubble({ message }: Props) {
           <div className="flex items-center gap-2">
             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
               data.intent === 'nl2sql'
-                ? 'bg-blue-100 text-blue-700'
+                ? 'bg-bcbs-50 text-bcbs-600 ring-1 ring-bcbs-200'
                 : data.intent === 'rag'
-                ? 'bg-green-100 text-green-700'
-                : 'bg-amber-100 text-amber-700'
+                ? 'bg-green-50 text-green-700 ring-1 ring-green-200'
+                : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
             }`}>
               {data.intent === 'nl2sql' ? 'Data Query' : data.intent === 'rag' ? 'Document Search' : 'Clarification'}
             </span>
             {data.timing_ms && (
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-bcbs-400">
                 {(data.timing_ms / 1000).toFixed(1)}s
               </span>
             )}
@@ -58,7 +58,7 @@ export default function MessageBubble({ message }: Props) {
         )}
 
         {/* Answer */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="bg-white rounded-xl ring-1 ring-bcbs-100 shadow-sm hover:shadow-md transition-shadow duration-200 p-4">
           <div className="prose prose-sm max-w-none">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {message.content}
