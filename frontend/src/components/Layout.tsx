@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
-import { MessageSquare, Upload, Activity } from 'lucide-react'
+import { MessageSquare, Upload, Lightbulb } from 'lucide-react'
 import type { ConfigResponse } from '@/lib/api'
 import { fetchConfig } from '@/lib/api'
+import PalmettoLogo from '@/components/PalmettoLogo'
+import { ENABLE_AI_OPPORTUNITIES } from '@/config/featureFlags'
+
+export type TabId = 'chat' | 'upload' | 'ai'
 
 interface LayoutProps {
   children: React.ReactNode
-  activeTab: 'chat' | 'upload'
-  onTabChange: (tab: 'chat' | 'upload') => void
+  activeTab: TabId
+  onTabChange: (tab: TabId) => void
 }
 
 export default function Layout({ children, activeTab, onTabChange }: LayoutProps) {
@@ -23,8 +27,8 @@ export default function Layout({ children, activeTab, onTabChange }: LayoutProps
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-auto sm:h-16 flex-wrap">
             <div className="flex items-center gap-3">
-              <Activity className="h-8 w-8" />
-              <h1 className="text-xl font-bold">BCBS Claims AI</h1>
+              <PalmettoLogo className="h-8 w-8" />
+              <h1 className="text-xl font-bold">Palmetto AI</h1>
             </div>
 
             {/* Tabs */}
@@ -57,6 +61,22 @@ export default function Layout({ children, activeTab, onTabChange }: LayoutProps
                   <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-white rounded-full" />
                 )}
               </button>
+              {ENABLE_AI_OPPORTUNITIES && (
+                <button
+                  onClick={() => onTabChange('ai')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative ${
+                    activeTab === 'ai'
+                      ? 'bg-white/15 backdrop-blur-sm text-white shadow-inner'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Lightbulb className="h-4 w-4" />
+                  AI Opportunities
+                  {activeTab === 'ai' && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-white rounded-full" />
+                  )}
+                </button>
+              )}
             </nav>
           </div>
         </div>
