@@ -103,7 +103,7 @@ git clone https://github.com/slysik/Healthcare-Claims-AI.git
 cd Healthcare-Claims-AI
 
 # Copy environment template
-cp .env.sample .env
+cp env.template .env
 # Edit .env and add your ANTHROPIC_API_KEY
 
 # Start everything with one command
@@ -118,7 +118,7 @@ This starts:
 
 ```bash
 # Copy environment template
-cp .env.sample .env
+cp env.template .env
 # Edit .env and add your ANTHROPIC_API_KEY
 
 # Build and run
@@ -168,7 +168,7 @@ bun run dev
 
 ## Environment Variables
 
-Copy `.env.sample` to `.env` and configure:
+Copy `env.template` to `.env` and configure:
 
 ### Required
 
@@ -198,8 +198,8 @@ RAG_ENGINE=bm25
 ### Agent Tuning
 
 ```bash
-# SQL self-correction max retries (default 1)
-SQL_MAX_RETRIES=1
+# SQL self-correction max retries (default 2)
+SQL_MAX_RETRIES=2
 
 # Demo mode: returns canned responses for pre-seeded queries (no LLM call)
 DEMO_MODE=true
@@ -367,7 +367,7 @@ bcbs/
 ├── docker-compose.yml
 ├── Dockerfile.backend
 ├── Dockerfile.frontend
-├── .env.sample
+├── env.template
 └── README.md
 ```
 

@@ -67,6 +67,7 @@ export function useChat(): UseChatReturn {
         let accumulatedAnswer = ''
         let traceEvents: TraceEvent[] = []
         let finalResponse: AgentResponse | null = null
+        let currentEvent = ''
 
         while (true) {
           const { done, value } = await reader.read()
@@ -78,13 +79,25 @@ export function useChat(): UseChatReturn {
 
           for (const line of lines) {
             if (line.startsWith('event: ')) {
-              // Skip event type line, data follows
+              currentEvent = line.slice(7).trim()
+              continue
+            }
+            if (!line.trim()) {
+              // Blank line terminates one SSE event block
+              currentEvent = ''
               continue
             }
             if (!line.startsWith('data: ')) continue
 
             const dataStr = line.slice(6).trim()
             if (!dataStr) continue
+
+            if (currentEvent === 'answer_chunk') {
+              // Backend streams plain text chunks for answer tokens.
+              accumulatedAnswer += dataStr
+              setCurrentAnswer(accumulatedAnswer)
+              continue
+            }
 
             try {
               const data = JSON.parse(dataStr)
