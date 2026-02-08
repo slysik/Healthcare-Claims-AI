@@ -20,6 +20,7 @@ export default function FeatureCard({
   isActive = false,
 }: FeatureCardProps) {
   const [showTooltip, setShowTooltip] = useState(false)
+  const tooltipId = `feature-card-tooltip-${title.toLowerCase().replace(/\s+/g, '-')}`
 
   return (
     <button
@@ -56,8 +57,12 @@ export default function FeatureCard({
         className="relative mt-auto"
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
+        onFocus={() => setShowTooltip(true)}
+        onBlur={() => setShowTooltip(false)}
       >
         <span
+          tabIndex={0}
+          aria-describedby={showTooltip ? tooltipId : undefined}
           className={cn(
             'inline-block rounded-full px-2.5 py-0.5 text-[10px] font-semibold',
             isActive ? 'bg-bcbs-500/10 text-bcbs-700' : 'bg-gray-100 text-gray-600',
@@ -69,6 +74,7 @@ export default function FeatureCard({
         {showTooltip && (
           <div
             role="tooltip"
+            id={tooltipId}
             className={cn(
               'absolute bottom-full left-0 mb-2 z-10',
               'w-48 rounded-lg bg-gray-900 px-3 py-2',

@@ -224,6 +224,7 @@ export default function AskMyPlanDocsModule() {
           <button
             type="submit"
             disabled={!input.trim() || state === 'loading'}
+            aria-label="Send follow-up question"
             className={cn(
               'flex items-center justify-center rounded-lg bg-bcbs-600 px-4 py-2.5',
               'text-white hover:bg-bcbs-700 transition-colors',

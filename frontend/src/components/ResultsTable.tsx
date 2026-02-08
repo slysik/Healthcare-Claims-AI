@@ -50,13 +50,24 @@ export default function ResultsTable({ data }: Props) {
               {columns.map((col) => (
                 <th
                   key={col}
-                  onClick={() => handleSort(col)}
-                  className="px-3 py-2 text-left font-medium text-bcbs-700 cursor-pointer hover:bg-bcbs-100 transition-colors duration-150 whitespace-nowrap text-xs sm:text-sm"
+                  className="px-3 py-2 text-left font-medium text-bcbs-700 whitespace-nowrap text-xs sm:text-sm"
+                  aria-sort={
+                    sortKey === col
+                      ? sortDir === 'asc'
+                        ? 'ascending'
+                        : 'descending'
+                      : 'none'
+                  }
                 >
-                  <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handleSort(col)}
+                    className="flex items-center gap-1 hover:bg-bcbs-100 transition-colors duration-150 rounded px-1 py-0.5 -mx-1"
+                    aria-label={`Sort by ${col}`}
+                  >
                     {col}
                     <ArrowUpDown className="h-3 w-3 text-bcbs-300" />
-                  </div>
+                  </button>
                 </th>
               ))}
             </tr>

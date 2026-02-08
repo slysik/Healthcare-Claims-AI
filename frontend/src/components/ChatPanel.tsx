@@ -186,6 +186,7 @@ export default function ChatPanel() {
               onClick={cancelStream}
               className="px-4 py-2.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors min-h-[48px] sm:min-h-0"
               title="Cancel"
+              aria-label="Cancel response"
             >
               <Square className="h-4 w-4" />
             </button>
@@ -193,6 +194,7 @@ export default function ChatPanel() {
             <button
               type="submit"
               disabled={!input.trim()}
+              aria-label="Send message"
               className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-bcbs-500 to-bcbs-600 text-white hover:from-bcbs-600 hover:to-bcbs-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm min-h-[48px] sm:min-h-0"
             >
               <Send className="h-4 w-4" />
