@@ -1,5 +1,5 @@
 #!/bin/bash
-# Setup AWS resources for BCBS Claims AI Demo
+# Setup AWS resources for Healthcare Claims AI Demo
 # All resources are free tier eligible
 # Prerequisites: AWS CLI configured with appropriate permissions
 
@@ -7,11 +7,11 @@ set -euo pipefail
 
 REGION="${AWS_REGION:-us-east-1}"
 SUFFIX=$(echo $RANDOM | md5sum | head -c 8 2>/dev/null || echo "demo")
-S3_BUCKET="bcbs-demo-data-${SUFFIX}"
-DYNAMO_TABLE="bcbs-conversations"
-IAM_USER="bcbs-demo-user"
+S3_BUCKET="claims-ai-demo-data-${SUFFIX}"
+DYNAMO_TABLE="claims-ai-conversations"
+IAM_USER="claims-ai-demo-user"
 
-echo "=== BCBS Claims AI - AWS Setup ==="
+echo "=== Healthcare Claims AI - AWS Setup ==="
 echo "Region: ${REGION}"
 echo ""
 
@@ -115,11 +115,11 @@ EOF
 )
 
 POLICY_ARN=$(aws iam create-policy \
-    --policy-name "bcbs-demo-policy" \
+    --policy-name "claims-ai-demo-policy" \
     --policy-document "${POLICY_DOC}" \
     --query "Policy.Arn" \
     --output text 2>/dev/null || \
-    aws iam list-policies --query "Policies[?PolicyName=='bcbs-demo-policy'].Arn" --output text)
+    aws iam list-policies --query "Policies[?PolicyName=='claims-ai-demo-policy'].Arn" --output text)
 
 aws iam attach-user-policy --user-name "${IAM_USER}" --policy-arn "${POLICY_ARN}" 2>/dev/null || true
 

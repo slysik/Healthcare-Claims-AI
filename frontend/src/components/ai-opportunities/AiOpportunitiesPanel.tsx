@@ -99,7 +99,7 @@ export default function AiOpportunitiesPanel() {
             <button
               type="button"
               onClick={() => setActiveModule(null)}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-bcbs-600 hover:text-bcbs-700 transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to AI Opportunities

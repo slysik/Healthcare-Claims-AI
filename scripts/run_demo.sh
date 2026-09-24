@@ -1,11 +1,11 @@
 #!/bin/bash
-# Start the BCBS Claims AI demo (backend + frontend)
+# Start the Healthcare Claims AI demo (backend + frontend)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-echo "=== BCBS Claims AI Demo ==="
+echo "=== Healthcare Claims AI Demo ==="
 echo "Project: ${PROJECT_DIR}"
 
 # Check for .env file

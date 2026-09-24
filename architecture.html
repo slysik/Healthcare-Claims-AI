@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BCBS Claims AI - System Architecture</title>
+<title>Healthcare Claims AI - System Architecture</title>
 <style>
   :root {
     --bg: #0f172a;
@@ -508,126 +508,9 @@
 </head>
 <body>
 
-<h1>BCBS Claims AI</h1>
+<h1>Healthcare Claims AI</h1>
 <p class="subtitle">Intelligent Healthcare Claims Assistant &mdash; System Architecture Overview</p>
 
-<!-- ════════════════════════════════════════════ -->
-<!-- SKILLS ALIGNMENT -->
-<!-- ════════════════════════════════════════════ -->
-
-<div class="skills-banner">
-  <div class="skills-header">
-    <h2>BCBS SC AI Agentic Engineer &mdash; Skills Alignment</h2>
-    <div class="skills-score">
-      <div class="score-badge">10/10 Required</div>
-      <div class="score-badge" style="background:rgba(129,140,248,0.15); border-color:rgba(129,140,248,0.3); color:var(--accent2);">4/4 Nice-to-Have</div>
-      <div class="score-badge" style="background:rgba(74,222,128,0.1); border-color:rgba(74,222,128,0.25); color:var(--green); font-size:0.75rem; font-weight:500;">+ 2 Bonus</div>
-    </div>
-  </div>
-  <div class="skills-grid">
-    <!-- Required -->
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">LangChain + LangGraph</span>
-      <span class="skill-where">6-node StateGraph agent</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">Claude / LLMs</span>
-      <span class="skill-where">Anthropic + Bedrock switchable</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">Agentic AI (reasoning, tool use)</span>
-      <span class="skill-where">Routing + self-correction loop</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">Prompt Engineering</span>
-      <span class="skill-where">5 prompt templates, NL2SQL gen</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">Cloud (AWS preferred)</span>
-      <span class="skill-where">Bedrock, S3, DynamoDB, IAM</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">Docker &amp; Kubernetes</span>
-      <span class="skill-where">docker-compose, health checks</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">Document Databases</span>
-      <span class="skill-where">DynamoDB conversations</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">JavaScript / TypeScript</span>
-      <span class="skill-where">React + Vite + typed API client</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">RESTful API Development</span>
-      <span class="skill-where">FastAPI, 10 endpoints, Swagger</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#10003;</span>
-      <span class="skill-type type-req">REQ</span>
-      <span class="skill-name">Production-Grade AI</span>
-      <span class="skill-where">SSE streaming, error recovery</span>
-    </div>
-    <!-- Nice-to-Have -->
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--accent2)">&#10003;</span>
-      <span class="skill-type type-nice">N2H</span>
-      <span class="skill-name">FastAPI or Flask</span>
-      <span class="skill-where">Async FastAPI + lifespan + CORS</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--accent2)">&#10003;</span>
-      <span class="skill-type type-nice">N2H</span>
-      <span class="skill-name">RAG, Embeddings, Knowledge Stores</span>
-      <span class="skill-where">BM25 + ChromaDB dual engine</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--accent2)">&#10003;</span>
-      <span class="skill-type type-nice">N2H</span>
-      <span class="skill-name">Adaptable Architecture</span>
-      <span class="skill-where">Switchable LLM, RAG, storage</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--accent2)">&#10003;</span>
-      <span class="skill-type type-nice">N2H</span>
-      <span class="skill-name">Error Recovery</span>
-      <span class="skill-where">SQL self-correction, fallbacks</span>
-    </div>
-    <!-- Bonus -->
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#9733;</span>
-      <span class="skill-type type-bonus">BONUS</span>
-      <span class="skill-name">SQL Self-Correction</span>
-      <span class="skill-where">Auto-fix + retry with LLM</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-status" style="color:var(--green)">&#9733;</span>
-      <span class="skill-type type-bonus">BONUS</span>
-      <span class="skill-name">Dual RAG Engine</span>
-      <span class="skill-where">BM25 (demo) / ChromaDB (prod)</span>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════════ -->
 <!-- SYSTEM LAYERS -->
 <!-- ════════════════════════════════════════════ -->
 
@@ -1067,7 +950,7 @@
 <!-- ════════════════════════════════════════════ -->
 
 <div class="footer">
-  BCBS Claims AI &mdash; Built by Steve Lysik for BCBS SC AI Agentic Engineer &mdash; February 2026
+  Healthcare Claims AI &mdash; Sample healthcare AI workflow by Steve Lysik
 </div>
 
 </body>

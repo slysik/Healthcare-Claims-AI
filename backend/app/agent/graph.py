@@ -1,4 +1,4 @@
-"""LangGraph state graph for BCBS Claims AI agent."""
+"""LangGraph state graph for Healthcare Claims AI agent."""
 
 from langgraph.graph import END, StateGraph
 

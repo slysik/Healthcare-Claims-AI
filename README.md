@@ -1,8 +1,34 @@
-# BCBS Claims AI - Intelligent Healthcare Claims Assistant
+# Healthcare Claims AI — Sample Agentic Workflow for Claims & Benefits Automation
 
-A production-ready demonstration of agentic AI for healthcare claims processing, combining LangGraph routing agents with dual-path intelligence: NL2SQL for data analytics and RAG for policy Q&A. Built with Claude, LangChain, FastAPI, and React.
+A working reference implementation showing how a healthcare operations or analytics team can use an AI agent to answer claims and benefits questions on its own—without writing SQL or searching policy PDFs by hand.
 
-Built for the BCBS SC AI Agentic Engineer position, showcasing enterprise-grade GenAI capabilities with AWS integration, streaming responses, SQL self-correction, and containerized deployment.
+Ask a question in plain English. A LangGraph agent decides whether it is a **data question** (routes to NL2SQL over claims data, with automatic SQL self-correction) or a **policy question** (routes to retrieval over plan documents, with page-level citations), then streams back the answer, the SQL it ran, a chart, and a trace of every step it took.
+
+> **Data notice:** everything here runs on synthetic data—1,000 generated claims and a fictional "Sample Health Plan" benefits booklet. No PHI, no real payer or provider data.
+
+## Why this exists
+
+Claims, revenue-cycle, and member-services teams spend a large share of their day on repeatable lookups: *Which providers have the most denials? What does the plan cover for telehealth? What changed in charges by status this quarter?* Each one usually means a ticket to an analyst or a hunt through a benefits document.
+
+This project is a template for taking that work off the queue:
+
+| Team need | What the workflow does |
+|-----------|------------------------|
+| Self-serve claims analytics | Turns natural-language questions into SQL, runs it, returns a table and chart |
+| Fewer failed queries | Detects SQL errors and rewrites the query automatically (configurable retries) |
+| Trustworthy policy answers | Retrieves from plan documents and cites the page and section it used |
+| Reviewability | Shows the generated SQL and a node-by-node agent trace for every answer |
+| Bring your own data | Upload a CSV (converted to Parquet, loaded into DuckDB) or a PDF (indexed for retrieval) from the UI |
+| Portability | Same agent runs on the Anthropic API or AWS Bedrock; local or Docker; AWS services optional |
+
+## How a team would extend it
+
+The pattern is deliberately small so a team can adapt it quickly:
+
+1. **Swap the data** — point DuckDB at your own claims extract, or replace it with Snowflake/Databricks/Redshift behind the same `execute_query` node.
+2. **Swap the documents** — drop in your plan booklets, SOPs, or payer policies; switch `RAG_ENGINE=chroma` for larger document sets.
+3. **Add a path** — add a new intent to `classify_intent` and a node for it (e.g., prior-auth checklist, denial-appeal letter draft), then wire it into the graph.
+4. **Harden for production** — add authentication, role-based access, PHI-safe hosting, audit logging, and an evaluation set of known question/answer pairs before real data touches it.
 
 ## Architecture
 
@@ -68,23 +94,25 @@ All nodes stream real-time progress via Server-Sent Events (SSE).
 
 ## Tech Stack
 
-Technology choices directly aligned with BCBS SC AI Agentic Engineer job requirements:
+| Component | Technology | Why it is here |
+|-----------|-----------|----------------|
+| **Agent framework** | LangChain + LangGraph | Explicit, inspectable state graph with conditional routing and retry |
+| **LLM** | Claude (Anthropic API or AWS Bedrock) | Switchable by env var; same agent code |
+| **Backend** | FastAPI + Python 3.12 | Async streaming, typed request/response models, auto-generated API docs |
+| **NL2SQL engine** | DuckDB (in-process) | Fast analytical SQL over Parquet with no database server |
+| **Retrieval** | BM25 (default) or ChromaDB + FastEmbed | Zero-download default; vector search when document volume grows |
+| **Cloud (optional)** | AWS S3, DynamoDB, Bedrock | Parquet storage, conversation history, managed LLM access |
+| **Containers** | Docker + docker-compose | One-command full-stack run |
+| **Frontend** | React + Vite + TypeScript + Tailwind | Chat, tables, charts, SQL viewer, agent trace, citations |
+| **Streaming** | Server-Sent Events | Live token and agent-step updates |
 
-| Component | Technology | BCBS Requirement |
-|-----------|-----------|------------------|
-| **Agent Framework** | LangChain + LangGraph | Required: "LangChain, LangGraph" |
-| **LLM** | Claude (Anthropic API or AWS Bedrock) | Required: "Claude, OpenAI, or comparable LLMs" |
-| **Backend** | FastAPI + Python 3.12 | Nice-to-have: "FastAPI or Flask" |
-| **NL2SQL** | DuckDB (in-process) | Required: "Agentic AI - tool use" |
-| **RAG** | BM25 (default) or ChromaDB + FastEmbed | Nice-to-have: "RAG, embeddings, knowledge stores" |
-| **Cloud** | AWS (S3, DynamoDB, Bedrock) | Required: "Cloud environments (AWS preferred)" |
-| **Containers** | Docker + docker-compose | Required: "Docker, Kubernetes" |
-| **Database** | DynamoDB (optional) | Required: "document databases" |
-| **Frontend** | React + Vite + TypeScript | Required: "JavaScript / TypeScript" |
-| **Streaming** | SSE (Server-Sent Events) | Required: "Production-grade AI solutions" |
-| **Data Format** | Parquet (S3 optional) | Enterprise standard |
+## Responsible AI & data handling
 
-**Coverage: 10/10 required skills + 4 nice-to-haves**
+- **Synthetic data only** in this repository; no PHI.
+- **Transparent answers:** every data answer shows the SQL that produced it; every policy answer shows its source citations.
+- **Visible reasoning path:** the agent trace shows which route was taken and how long each step ran.
+- **Disclaimers and human hand-off** are built into the UI; answers are informational, not medical or benefits advice.
+- **Not production-hardened:** real deployments need HIPAA-eligible hosting, a BAA with the LLM provider, access controls, audit logging, and evaluation before use with real data.
 
 ## Quick Start
 
@@ -222,7 +250,7 @@ AWS_REGION=us-east-1
 S3_BUCKET=
 
 # DynamoDB table for conversation persistence (optional)
-DYNAMODB_TABLE=bcbs-conversations
+DYNAMODB_TABLE=claims-ai-conversations
 ```
 
 **Without AWS**: App uses local Parquet files and in-memory conversation storage.
@@ -265,7 +293,7 @@ DYNAMODB_TABLE=bcbs-conversations
 ### Demo Mode with Canned Responses
 
 - `DEMO_MODE=true`: First 2 pre-seeded queries return instant canned responses (no LLM call)
-- Eliminates cold-start risk during live demos
+- Gives a reliable first-run experience with no API key or cold start
 - Configurable via env var, transparent to user
 
 ### Switchable LLM Provider
@@ -287,6 +315,10 @@ DYNAMODB_TABLE=bcbs-conversations
 - Backend image: <800MB (Python 3.12-slim, UV package manager, no PyTorch)
 - Frontend image: nginx-alpine serving static Vite build
 - Health checks ensure proper startup order
+
+### AI Opportunities tab (concept prototypes)
+
+A feature-flagged tab with four clickable concepts—**Ask My Claims**, **Ask My Plan Documents**, **Health Spend Insights**, and **AI Workflows** (step-by-step guidance for appeals, prior authorization, cost comparison, and benefits checks). These are **front-end prototypes on mock data** used to explore where the same agent pattern could go next; they do not call the backend.
 
 ## API Endpoints
 
@@ -314,7 +346,7 @@ Full API documentation: http://localhost:8000/docs (Swagger UI)
 ## Project Structure
 
 ```
-bcbs/
+Healthcare-Claims-AI/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py              # FastAPI app + startup health checks
@@ -359,7 +391,7 @@ bcbs/
 │   ├── generate_claims.py        # Synthetic data generator
 │   ├── generate_benefits_pdf.py  # Benefits PDF generator
 │   ├── sample_claims.csv         # 1,000 synthetic claims
-│   └── bcbs_benefits_summary.pdf # 10-page benefits summary
+│   └── sample_benefits_summary.pdf # 10-page benefits summary
 ├── scripts/
 │   ├── run_demo.sh               # Start backend + frontend
 │   ├── setup_aws.sh              # Optional AWS resource creation
@@ -373,10 +405,8 @@ bcbs/
 
 ## Sample Data
 
-- **Claims CSV**: 1,000 synthetic claims (no real PHI) with diagnosis codes (ICD-10), procedure codes (CPT), providers, amounts, statuses (PAID/DENIED/PENDING), denial reasons
-- **Benefits PDF**: 10-page BCBS benefits summary generated with fpdf2 (deductibles, copays, covered services, telehealth, prior auth, exclusions)
-
-All data is controlled and synthetic to ensure reliable demo behavior.
+- **Claims CSV**: 1,000 synthetic claims (no PHI) with ICD-10 diagnosis codes, CPT procedure codes, providers, amounts, statuses (PAID/DENIED/PENDING), and denial reasons — generated by `data/generate_claims.py`
+- **Benefits PDF**: 10-page benefits booklet for a fictional "Sample Health Plan" (deductibles, copays, covered services, telehealth, prior auth, exclusions) — generated by `data/generate_benefits_pdf.py`
 
 ## Development
 
@@ -411,7 +441,7 @@ cd frontend && bun run build
 docker-compose build
 
 # Check image size (should be <800MB for backend)
-docker images | grep bcbs
+docker images | grep healthcare-claims-ai
 
 # Run with logs
 docker-compose up
@@ -435,4 +465,4 @@ docker-compose down
 
 ---
 
-Built by [Steve Lysik](https://github.com/slysik) for BCBS SC AI Agentic Engineer interview (February 2026)
+Built by [Steve Lysik](https://github.com/slysik) as a sample healthcare AI workflow.

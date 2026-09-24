@@ -26,12 +26,12 @@ export default function HandoffCTA({
       aria-label={isDemoOnly ? `${label} (Demo only)` : label}
       title={isDemoOnly ? 'Demo only action' : undefined}
       className={cn(
-        'inline-flex items-center gap-2 rounded-lg border-2 border-bcbs-500 px-4 py-2.5',
-        'text-sm font-semibold text-bcbs-600 bg-white',
+        'inline-flex items-center gap-2 rounded-lg border-2 border-brand-500 px-4 py-2.5',
+        'text-sm font-semibold text-brand-600 bg-white',
         'transition-all duration-200',
-        'hover:bg-bcbs-50 hover:shadow-md hover:shadow-bcbs-200/50',
+        'hover:bg-brand-50 hover:shadow-md hover:shadow-brand-200/50',
         !isDemoOnly && 'hover:animate-pulse',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bcbs-400 focus-visible:ring-offset-2',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2',
         !isDemoOnly && 'active:scale-[0.98]',
         isDemoOnly && 'cursor-not-allowed opacity-70',
       )}

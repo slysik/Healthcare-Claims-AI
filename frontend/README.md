@@ -1,6 +1,6 @@
-# BCBS Claims AI - Frontend
+# Healthcare Claims AI - Frontend
 
-React + TypeScript frontend for the BCBS Claims AI Demo, featuring real-time streaming chat with Claude, interactive data visualizations, and document upload capabilities.
+React + TypeScript frontend for the Healthcare Claims AI Demo, featuring real-time streaming chat with Claude, interactive data visualizations, and document upload capabilities.
 
 ## Tech Stack
 
@@ -120,7 +120,7 @@ The project uses strict TypeScript settings:
 
 ### Styling
 - Tailwind utility classes
-- Custom BCBS blue color scheme (`#0057B8`)
+- Custom blue color scheme (`#0057B8`)
 - Responsive design with max-width containers
 - Custom scrollbar styling
 
@@ -152,4 +152,4 @@ Run `npm run build` to check for TypeScript errors before deployment.
 
 ## License
 
-Internal Blue Cross Blue Shield project - not for public distribution.
+Sample project by Steve Lysik. Uses synthetic data only; see the root README.

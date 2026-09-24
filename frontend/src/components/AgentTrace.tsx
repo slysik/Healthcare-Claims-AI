@@ -26,7 +26,7 @@ export default function AgentTrace({ events }: Props) {
             <div
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
                 event.status === 'running'
-                  ? 'bg-bcbs-50 text-bcbs-600 ring-1 ring-bcbs-200 animate-pulse'
+                  ? 'bg-brand-50 text-brand-600 ring-1 ring-brand-200 animate-pulse'
                   : event.status === 'complete'
                   ? 'bg-green-50 text-green-700 ring-1 ring-green-200'
                   : 'bg-red-50 text-red-700 ring-1 ring-red-200'
@@ -49,7 +49,7 @@ export default function AgentTrace({ events }: Props) {
               )}
             </div>
             {!isLast && (
-              <div className="w-3 h-px bg-bcbs-200" />
+              <div className="w-3 h-px bg-brand-200" />
             )}
           </div>
         )

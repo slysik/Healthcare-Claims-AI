@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BCBS Claims AI - GenAI End-to-End Architecture</title>
+<title>Healthcare Claims AI - GenAI End-to-End Architecture</title>
 <style>
   :root {
     --bg: #0f172a; --surface: #1e293b; --surface2: #334155; --border: #475569;
@@ -377,7 +377,7 @@
     </div>
     <div class="card b-teal">
       <h3 style="color:var(--teal)">Unstructured Data &mdash; Benefits PDF</h3>
-      <p><strong style="color:var(--text)">10-page BCBS benefits summary</strong> (generated with fpdf2)</p>
+      <p><strong style="color:var(--text)">10-page sample benefits summary</strong> (generated with fpdf2)</p>
       <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--muted);">
         <strong>Content:</strong> Deductibles, copays, covered services, telehealth, prior authorization, exclusions<br><br>
         <strong>Pipeline:</strong> PDF &rarr; PyMuPDF text extraction &rarr; 500-char overlapping chunks &rarr; BM25/ChromaDB index &rarr; similarity search
@@ -524,13 +524,13 @@
     {
       "text": "In-network deductible: $1,500 individual...",
       "page": 3,
-      "doc_name": "bcbs_benefits_summary.pdf",
+      "doc_name": "sample_benefits_summary.pdf",
       "score": 0.89
     },
     {
       "text": "Family deductible: $3,000 in-network...",
       "page": 3,
-      "doc_name": "bcbs_benefits_summary.pdf",
+      "doc_name": "sample_benefits_summary.pdf",
       "score": 0.82
     }
   ],
@@ -578,7 +578,7 @@
   </div>
 </div>
 
-<div class="footer">BCBS Claims AI &mdash; GenAI End-to-End Architecture &mdash; LangGraph + Claude + DuckDB + BM25/ChromaDB</div>
+<div class="footer">Healthcare Claims AI &mdash; GenAI End-to-End Architecture &mdash; LangGraph + Claude + DuckDB + BM25/ChromaDB</div>
 
 </div>
 </body>

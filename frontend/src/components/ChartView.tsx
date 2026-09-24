@@ -71,7 +71,7 @@ export default function ChartView({ data, chartType }: Props) {
   }
 
   return (
-    <div className="bg-white ring-1 ring-bcbs-100 shadow-sm rounded-xl p-4">
+    <div className="bg-white ring-1 ring-brand-100 shadow-sm rounded-xl p-4">
       <ResponsiveContainer width="100%" height={300}>
         {renderChart()}
       </ResponsiveContainer>

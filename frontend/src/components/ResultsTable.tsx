@@ -42,15 +42,15 @@ export default function ResultsTable({ data }: Props) {
   if (data.length === 0) return null
 
   return (
-    <div className="ring-1 ring-bcbs-100 rounded-xl overflow-hidden shadow-sm">
+    <div className="ring-1 ring-brand-100 rounded-xl overflow-hidden shadow-sm">
       <div className="overflow-x-auto max-h-80">
         <table className="w-full text-sm">
-          <thead className="bg-bcbs-50 sticky top-0">
+          <thead className="bg-brand-50 sticky top-0">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col}
-                  className="px-3 py-2 text-left font-medium text-bcbs-700 whitespace-nowrap text-xs sm:text-sm"
+                  className="px-3 py-2 text-left font-medium text-brand-700 whitespace-nowrap text-xs sm:text-sm"
                   aria-sort={
                     sortKey === col
                       ? sortDir === 'asc'
@@ -62,19 +62,19 @@ export default function ResultsTable({ data }: Props) {
                   <button
                     type="button"
                     onClick={() => handleSort(col)}
-                    className="flex items-center gap-1 hover:bg-bcbs-100 transition-colors duration-150 rounded px-1 py-0.5 -mx-1"
+                    className="flex items-center gap-1 hover:bg-brand-100 transition-colors duration-150 rounded px-1 py-0.5 -mx-1"
                     aria-label={`Sort by ${col}`}
                   >
                     {col}
-                    <ArrowUpDown className="h-3 w-3 text-bcbs-300" />
+                    <ArrowUpDown className="h-3 w-3 text-brand-300" />
                   </button>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-bcbs-100/50">
+          <tbody className="divide-y divide-brand-100/50">
             {sortedData.map((row, idx) => (
-              <tr key={idx} className="hover:bg-bcbs-50/50 transition-colors duration-150">
+              <tr key={idx} className="hover:bg-brand-50/50 transition-colors duration-150">
                 {columns.map((col) => (
                   <td key={col} className="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs sm:text-sm">
                     {row[col] != null ? String(row[col]) : '—'}
@@ -86,7 +86,7 @@ export default function ResultsTable({ data }: Props) {
         </table>
       </div>
       {data.length > 50 && (
-        <div className="px-3 py-1.5 bg-bcbs-50 text-xs text-bcbs-500 border-t border-bcbs-100">
+        <div className="px-3 py-1.5 bg-brand-50 text-xs text-brand-500 border-t border-brand-100">
           Showing 50 of {data.length} rows
         </div>
       )}

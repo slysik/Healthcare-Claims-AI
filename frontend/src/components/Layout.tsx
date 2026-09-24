@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { MessageSquare, Upload, Lightbulb } from 'lucide-react'
 import type { ConfigResponse } from '@/lib/api'
 import { fetchConfig } from '@/lib/api'
-import PalmettoLogo from '@/components/PalmettoLogo'
+import AppLogo from '@/components/AppLogo'
 import { ENABLE_AI_OPPORTUNITIES } from '@/config/featureFlags'
 
 export type TabId = 'chat' | 'upload' | 'ai'
@@ -23,12 +23,12 @@ export default function Layout({ children, activeTab, onTabChange }: LayoutProps
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
-      <header className="bg-gradient-to-r from-bcbs-600 to-bcbs-800 shadow-xl text-white">
+      <header className="bg-gradient-to-r from-brand-600 to-brand-800 shadow-xl text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-auto sm:h-16 flex-wrap">
             <div className="flex items-center gap-3">
-              <PalmettoLogo className="h-8 w-8" />
-              <h1 className="text-xl font-bold">Palmetto AI</h1>
+              <AppLogo className="h-8 w-8" />
+              <h1 className="text-xl font-bold">Healthcare Claims AI</h1>
             </div>
 
             {/* Tabs */}
@@ -88,13 +88,13 @@ export default function Layout({ children, activeTab, onTabChange }: LayoutProps
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-bcbs-100 px-4 py-2">
+      <footer className="bg-white border-t border-brand-100 px-4 py-2">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-gray-500 flex-col sm:flex-row gap-2 sm:gap-0 text-center sm:text-left">
           <span>Powered by Claude + LangGraph</span>
           <div className="flex items-center gap-2">
             {config ? (
               <>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-bcbs-50 text-bcbs-600 font-medium">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 font-medium">
                   {config.llm_provider}
                 </span>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">

@@ -1,15 +1,15 @@
-export interface PalmettoLogoProps {
+export interface AppLogoProps {
   className?: string
 }
 
-export default function PalmettoLogo({ className = 'h-8 w-8' }: PalmettoLogoProps) {
+export default function AppLogo({ className = 'h-8 w-8' }: AppLogoProps) {
   return (
     <svg
       viewBox="0 0 64 64"
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="Palmetto AI logo"
+      aria-label="Healthcare Claims AI logo"
       role="img"
     >
       {/* Crescent moon */}

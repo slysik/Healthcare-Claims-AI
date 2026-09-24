@@ -1,17 +1,17 @@
-# BCBS Claims AI - Demo Scripts
+# Healthcare Claims AI - Demo Scripts
 
-Three executable bash scripts for setting up and running the BCBS Claims AI demo.
+Three executable bash scripts for setting up and running the Healthcare Claims AI demo.
 
 ## Scripts Overview
 
 ### 1. `scripts/setup_aws.sh`
 
-Automates AWS resource provisioning for the BCBS demo. All resources are free tier eligible.
+Automates AWS resource provisioning for the demo. All resources are free tier eligible.
 
 **What it does:**
-- Creates an S3 bucket with random suffix (e.g., `bcbs-demo-data-a1b2c3d4`)
-- Creates a DynamoDB table `bcbs-conversations` with conversation ID + timestamp key schema
-- Sets up an IAM user `bcbs-demo-user` with scoped permissions:
+- Creates an S3 bucket with random suffix (e.g., `claims-ai-demo-data-a1b2c3d4`)
+- Creates a DynamoDB table `claims-ai-conversations` with conversation ID + timestamp key schema
+- Sets up an IAM user `claims-ai-demo-user` with scoped permissions:
   - S3: GetObject, PutObject, ListBucket, DeleteObject
   - DynamoDB: PutItem, GetItem, Query, Scan, DeleteItem, BatchWriteItem
   - Bedrock: InvokeModel, InvokeModelWithResponseStream (Claude models only)
@@ -38,8 +38,8 @@ ENABLE_AWS=true
 AWS_ACCESS_KEY_ID=AKIA...
 AWS_SECRET_ACCESS_KEY=...
 AWS_REGION=us-east-1
-S3_BUCKET=bcbs-demo-data-a1b2c3d4
-DYNAMODB_TABLE=bcbs-conversations
+S3_BUCKET=claims-ai-demo-data-a1b2c3d4
+DYNAMODB_TABLE=claims-ai-conversations
 ```
 
 ---
@@ -80,7 +80,7 @@ Generates synthetic claims data and benefits PDF if they don't already exist.
 
 **What it does:**
 - Checks if `data/sample_claims.csv` exists; generates if missing
-- Checks if `data/bcbs_benefits_summary.pdf` exists; generates if missing
+- Checks if `data/sample_benefits_summary.pdf` exists; generates if missing
 - Runs generation scripts via `uv run python`
 - Displays file sizes at end
 
@@ -98,8 +98,8 @@ chmod +x scripts/seed_data.sh
 **Output:**
 ```
 === Data Ready ===
--rw-r--r--  1 user  staff   182K Feb  5 15:33 /Users/.../bcbs/data/sample_claims.csv
--rw-r--r--  1 user  staff    25K Feb  5 15:34 /Users/.../bcbs/data/bcbs_benefits_summary.pdf
+-rw-r--r--  1 user  staff   182K Feb  5 15:33 /Users/.../Healthcare-Claims-AI/data/sample_claims.csv
+-rw-r--r--  1 user  staff    25K Feb  5 15:34 /Users/.../Healthcare-Claims-AI/data/sample_benefits_summary.pdf
 ```
 
 ---

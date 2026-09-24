@@ -1,7 +1,7 @@
 [project]
-name = "bcbs-claims-ai"
+name = "healthcare-claims-ai"
 version = "0.1.0"
-description = "BCBS Claims AI Demo - Intelligent routing agent with NL2SQL and RAG"
+description = "Healthcare Claims AI Demo - Intelligent routing agent with NL2SQL and RAG"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi==0.115.8",

@@ -227,7 +227,7 @@ class ChromaRetriever(BaseRetriever):
 
         self.client = chromadb.PersistentClient(path=str(chroma_path))
         self.collection = self.client.get_or_create_collection(
-            name="bcbs_documents",
+            name="claims_documents",
             metadata={"hnsw:space": "cosine"}
         )
         logger.info(f"Initialized ChromaDB at {chroma_path}")

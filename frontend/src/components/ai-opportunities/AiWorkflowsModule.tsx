@@ -37,22 +37,22 @@ function WorkflowCard({
       type="button"
       onClick={() => onSelect(workflow)}
       className={cn(
-        'group flex items-start gap-3 rounded-lg border border-bcbs-100 bg-white p-4 text-left',
-        'transition-all duration-200 hover:border-bcbs-300 hover:shadow-md hover:shadow-bcbs-100/50',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bcbs-400 focus-visible:ring-offset-2',
+        'group flex items-start gap-3 rounded-lg border border-brand-100 bg-white p-4 text-left',
+        'transition-all duration-200 hover:border-brand-300 hover:shadow-md hover:shadow-brand-100/50',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2',
       )}
     >
-      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bcbs-50 text-bcbs-600 group-hover:bg-bcbs-100 transition-colors">
+      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 group-hover:bg-brand-100 transition-colors">
         <Zap className="h-4 w-4" />
       </div>
       <div className="flex-1 space-y-1">
-        <h3 className="text-sm font-semibold text-gray-900 group-hover:text-bcbs-700 transition-colors">
+        <h3 className="text-sm font-semibold text-gray-900 group-hover:text-brand-700 transition-colors">
           {workflow.title}
         </h3>
         <p className="text-xs text-gray-500 leading-relaxed">{workflow.description}</p>
         <p className="text-[10px] text-gray-400">{workflow.steps.length} steps</p>
       </div>
-      <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-gray-300 group-hover:text-bcbs-500 transition-colors" />
+      <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-gray-300 group-hover:text-brand-500 transition-colors" />
     </button>
   )
 }
@@ -111,7 +111,7 @@ function StepItem({
           className={cn(
             'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300',
             isComplete && 'bg-green-500 text-white',
-            isActive && 'bg-bcbs-500 text-white ring-4 ring-bcbs-100',
+            isActive && 'bg-brand-500 text-white ring-4 ring-brand-100',
             isError && 'bg-red-500 text-white',
             step.status === 'pending' && 'bg-gray-200 text-gray-500',
           )}
@@ -140,7 +140,7 @@ function StepItem({
           <h4
             className={cn(
               'text-sm font-semibold transition-colors',
-              isActive ? 'text-bcbs-700' : isComplete ? 'text-green-700' : 'text-gray-700',
+              isActive ? 'text-brand-700' : isComplete ? 'text-green-700' : 'text-gray-700',
             )}
           >
             {step.label}
@@ -170,11 +170,11 @@ function ProgressBar({ completed, total }: { completed: number; total: number })
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="font-medium text-gray-600">Progress</span>
-        <span className="font-semibold text-bcbs-600">{pct}%</span>
+        <span className="font-semibold text-brand-600">{pct}%</span>
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
         <div
-          className="h-full rounded-full bg-bcbs-500 transition-all duration-500 ease-out"
+          className="h-full rounded-full bg-brand-500 transition-all duration-500 ease-out"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -221,8 +221,8 @@ function CompletionSummary({
         type="button"
         onClick={onReset}
         className={cn(
-          'inline-flex items-center gap-2 rounded-lg border border-bcbs-200 bg-white px-4 py-2',
-          'text-sm font-medium text-bcbs-600 hover:bg-bcbs-50 transition-colors',
+          'inline-flex items-center gap-2 rounded-lg border border-brand-200 bg-white px-4 py-2',
+          'text-sm font-medium text-brand-600 hover:bg-brand-50 transition-colors',
         )}
       >
         <RotateCcw className="h-3.5 w-3.5" />
@@ -354,8 +354,8 @@ export default function AiWorkflowsModule() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bcbs-100">
-          <Zap className="h-5 w-5 text-bcbs-600" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-100">
+          <Zap className="h-5 w-5 text-brand-600" />
         </div>
         <h2 className="text-lg font-bold text-gray-900">AI Assistant Workflows</h2>
       </div>
@@ -381,14 +381,14 @@ export default function AiWorkflowsModule() {
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center gap-1 text-sm font-medium text-bcbs-600 hover:text-bcbs-700 transition-colors"
+            className="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to workflows
           </button>
 
           {/* Workflow title */}
-          <div className="rounded-lg border border-bcbs-100 bg-white p-4">
+          <div className="rounded-lg border border-brand-100 bg-white p-4">
             <h3 className="text-sm font-bold text-gray-900">{selectedWorkflow.title}</h3>
             <p className="mt-1 text-xs text-gray-500">{selectedWorkflow.description}</p>
           </div>
@@ -397,7 +397,7 @@ export default function AiWorkflowsModule() {
           <ProgressBar completed={completedCount} total={steps.length} />
 
           {/* Stepper */}
-          <div className="rounded-lg border border-bcbs-100 bg-white p-4">
+          <div className="rounded-lg border border-brand-100 bg-white p-4">
             {steps.map((step, idx) => (
               <StepItem
                 key={step.id}

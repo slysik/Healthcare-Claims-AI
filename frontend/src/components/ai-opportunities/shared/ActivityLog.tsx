@@ -23,7 +23,7 @@ function formatTimestamp(iso: string): string {
 function sourceColor(source: string): string {
   switch (source) {
     case 'Ask My Claims':
-      return 'bg-bcbs-100 text-bcbs-700'
+      return 'bg-brand-100 text-brand-700'
     case 'Ask My Plan Docs':
       return 'bg-purple-100 text-purple-700'
     case 'Health Spend Insights':
@@ -47,14 +47,14 @@ export default function ActivityLog({ entries, maxVisible = 5 }: ActivityLogProp
   const hasMore = sorted.length > maxVisible
 
   return (
-    <div className="rounded-lg border border-bcbs-100 bg-white">
+    <div className="rounded-lg border border-brand-100 bg-white">
       {/* Header */}
       <button
         type="button"
         onClick={() => setExpanded((prev) => !prev)}
         className={cn(
           'flex w-full items-center justify-between px-4 py-3',
-          'text-sm font-semibold text-bcbs-700 hover:bg-bcbs-50/50 transition-colors',
+          'text-sm font-semibold text-brand-700 hover:bg-brand-50/50 transition-colors',
         )}
       >
         <span className="flex items-center gap-2">
@@ -71,7 +71,7 @@ export default function ActivityLog({ entries, maxVisible = 5 }: ActivityLogProp
       </button>
 
       {/* Entries */}
-      <ul className="divide-y divide-bcbs-50">
+      <ul className="divide-y divide-brand-50">
         {visible.map((entry, i) => (
           <li key={`${entry.timestamp}-${i}`} className="px-4 py-2.5 text-sm hover:bg-gray-50/50">
             <div className="flex items-center justify-between gap-2">
@@ -98,7 +98,7 @@ export default function ActivityLog({ entries, maxVisible = 5 }: ActivityLogProp
         <button
           type="button"
           onClick={() => setExpanded((prev) => !prev)}
-          className="w-full border-t border-bcbs-50 px-4 py-2 text-xs font-medium text-bcbs-500 hover:bg-bcbs-50/50 transition-colors"
+          className="w-full border-t border-brand-50 px-4 py-2 text-xs font-medium text-brand-500 hover:bg-brand-50/50 transition-colors"
         >
           {expanded ? 'Show less' : `Show all ${sorted.length} entries`}
         </button>

@@ -18,7 +18,7 @@ import {
 const FOLLOWUP_RESPONSES: Record<string, PlanResponse> = {
   fallback: {
     answer:
-      'Based on your plan documents, I can help clarify that. Your Blue Options Gold PPO plan provides comprehensive coverage for most medically necessary services. For the most accurate answer to your specific question, I recommend checking the Schedule of Benefits on pages 12-18 of your plan booklet or calling Member Services at 1-800-868-2528.',
+      'Based on your plan documents, I can help clarify that. Your Gold PPO plan provides comprehensive coverage for most medically necessary services. For the most accurate answer to your specific question, I recommend checking the Schedule of Benefits on pages 12-18 of your plan booklet or calling Member Services.',
     citations: [
       { text: 'This plan provides coverage for medically necessary services as defined in the Certificate of Coverage.', page: 8, section: 'General Provisions', relevance: 0.72 },
     ],
@@ -123,7 +123,7 @@ export default function AskMyPlanDocsModule() {
     <section className="space-y-5">
       {/* Header */}
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-bcbs-100 text-bcbs-600">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-100 text-brand-600">
           <FileText className="h-5 w-5" />
         </div>
         <h2 className="text-lg font-bold text-gray-900">Ask My Plan Documents</h2>
@@ -139,9 +139,9 @@ export default function AskMyPlanDocsModule() {
               onClick={() => void submitQuestion(sq.question)}
               disabled={state === 'loading'}
               className={cn(
-                'shrink-0 rounded-full border border-bcbs-200 bg-bcbs-50 px-3 py-1.5',
-                'text-xs font-medium text-bcbs-700 whitespace-nowrap',
-                'hover:bg-bcbs-100 hover:border-bcbs-300 transition-colors',
+                'shrink-0 rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5',
+                'text-xs font-medium text-brand-700 whitespace-nowrap',
+                'hover:bg-brand-100 hover:border-brand-300 transition-colors',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
               )}
             >
@@ -158,7 +158,7 @@ export default function AskMyPlanDocsModule() {
             if (msg.role === 'user') {
               return (
                 <div key={i} className="flex justify-end">
-                  <div className="max-w-[85%] rounded-lg bg-bcbs-600 px-4 py-2.5 text-sm text-white">
+                  <div className="max-w-[85%] rounded-lg bg-brand-600 px-4 py-2.5 text-sm text-white">
                     {msg.content}
                   </div>
                 </div>
@@ -196,7 +196,7 @@ export default function AskMyPlanDocsModule() {
       {/* Loading */}
       {state === 'loading' && (
         <div className="flex items-center gap-2 py-4 text-sm text-gray-500">
-          <Loader2 className="h-4 w-4 animate-spin text-bcbs-500" />
+          <Loader2 className="h-4 w-4 animate-spin text-brand-500" />
           Searching plan documents...
         </div>
       )}
@@ -217,7 +217,7 @@ export default function AskMyPlanDocsModule() {
             className={cn(
               'flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5',
               'text-sm text-gray-800 placeholder:text-gray-400',
-              'focus:border-bcbs-400 focus:ring-2 focus:ring-bcbs-200 focus:outline-none',
+              'focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none',
               'disabled:opacity-50 transition-colors',
             )}
           />
@@ -226,8 +226,8 @@ export default function AskMyPlanDocsModule() {
             disabled={!input.trim() || state === 'loading'}
             aria-label="Send follow-up question"
             className={cn(
-              'flex items-center justify-center rounded-lg bg-bcbs-600 px-4 py-2.5',
-              'text-white hover:bg-bcbs-700 transition-colors',
+              'flex items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5',
+              'text-white hover:bg-brand-700 transition-colors',
               'disabled:opacity-50 disabled:cursor-not-allowed',
             )}
           >

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
-    logger.info("Starting BCBS Claims AI Backend")
+    logger.info("Starting Healthcare Claims AI Backend")
 
     import re
 
@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
 
     status_lines = []
     status_lines.append("=" * 60)
-    status_lines.append("BCBS Claims AI - Startup Status")
+    status_lines.append("Healthcare Claims AI - Startup Status")
     status_lines.append("=" * 60)
 
     # Load all CSV files
@@ -115,12 +115,12 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    logger.info("Shutting down BCBS Claims AI Backend")
+    logger.info("Shutting down Healthcare Claims AI Backend")
 
 
 # Create FastAPI app
 app = FastAPI(
-    title="BCBS Claims AI API",
+    title="Healthcare Claims AI API",
     description="Healthcare claims analysis with NL2SQL and RAG",
     version="1.0.0",
     lifespan=lifespan,
@@ -152,7 +152,7 @@ app.include_router(data.router)
 async def root():
     """API info endpoint."""
     return {
-        "name": "BCBS Claims AI API",
+        "name": "Healthcare Claims AI API",
         "version": "1.0.0",
         "status": "running",
         "docs": "/docs",

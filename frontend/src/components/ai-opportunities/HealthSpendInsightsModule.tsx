@@ -32,13 +32,13 @@ import { ConfidenceIndicator, AiDisclaimer, HandoffCTA } from './shared'
 // Constants
 // ---------------------------------------------------------------------------
 
-const BCBS_COLORS = ['#0057B8', '#003D82', '#60A5FA', '#93C5FD', '#BFDBFE', '#DBEAFE'] as const
+const BRAND_COLORS = ['#0057B8', '#003D82', '#60A5FA', '#93C5FD', '#BFDBFE', '#DBEAFE'] as const
 const CATEGORIES = ['Medical', 'Rx', 'Dental', 'Vision'] as const
 const CATEGORY_COLORS: Record<string, string> = {
-  Medical: BCBS_COLORS[0] ?? '#0057B8',
-  Rx: BCBS_COLORS[1] ?? '#003D82',
-  Dental: BCBS_COLORS[2] ?? '#60A5FA',
-  Vision: BCBS_COLORS[3] ?? '#93C5FD',
+  Medical: BRAND_COLORS[0] ?? '#0057B8',
+  Rx: BRAND_COLORS[1] ?? '#003D82',
+  Dental: BRAND_COLORS[2] ?? '#60A5FA',
+  Vision: BRAND_COLORS[3] ?? '#93C5FD',
 }
 
 // ---------------------------------------------------------------------------
@@ -54,8 +54,8 @@ interface SummaryCardProps {
 
 function SummaryCard({ icon, label, value, detail }: SummaryCardProps) {
   return (
-    <div className="rounded-lg border border-bcbs-100 bg-white p-4 shadow-sm">
-      <div className="flex items-center gap-2 text-bcbs-600">
+    <div className="rounded-lg border border-brand-100 bg-white p-4 shadow-sm">
+      <div className="flex items-center gap-2 text-brand-600">
         {icon}
         <span className="text-xs font-medium text-gray-500">{label}</span>
       </div>
@@ -245,8 +245,8 @@ export default function HealthSpendInsightsModule() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bcbs-100">
-          <TrendingUp className="h-5 w-5 text-bcbs-600" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-100">
+          <TrendingUp className="h-5 w-5 text-brand-600" />
         </div>
         <h2 className="text-lg font-bold text-gray-900">My Health Spend Insights</h2>
       </div>
@@ -282,7 +282,7 @@ export default function HealthSpendInsightsModule() {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Monthly Spend Stacked Bar Chart */}
-        <div className="rounded-lg border border-bcbs-100 bg-white p-4">
+        <div className="rounded-lg border border-brand-100 bg-white p-4">
           <h3 className="mb-4 text-sm font-semibold text-gray-700">Monthly Spend by Category</h3>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={barData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
@@ -316,7 +316,7 @@ export default function HealthSpendInsightsModule() {
         </div>
 
         {/* Category Breakdown Pie Chart */}
-        <div className="rounded-lg border border-bcbs-100 bg-white p-4">
+        <div className="rounded-lg border border-brand-100 bg-white p-4">
           <h3 className="mb-4 text-sm font-semibold text-gray-700">Category Breakdown</h3>
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
@@ -337,7 +337,7 @@ export default function HealthSpendInsightsModule() {
                 {pieData.map((entry) => (
                   <Cell
                     key={entry.name}
-                    fill={CATEGORY_COLORS[entry.name] ?? BCBS_COLORS[4]}
+                    fill={CATEGORY_COLORS[entry.name] ?? BRAND_COLORS[4]}
                   />
                 ))}
               </Pie>
@@ -350,7 +350,7 @@ export default function HealthSpendInsightsModule() {
       </div>
 
       {/* 12-Month Trend Line Chart */}
-      <div className="rounded-lg border border-bcbs-100 bg-white p-4">
+      <div className="rounded-lg border border-brand-100 bg-white p-4">
         <h3 className="mb-4 text-sm font-semibold text-gray-700">12-Month Spend Trend</h3>
         <ResponsiveContainer width="100%" height={240}>
           <LineChart data={trendData} margin={{ top: 5, right: 20, left: 5, bottom: 5 }}>
@@ -371,10 +371,10 @@ export default function HealthSpendInsightsModule() {
             <Line
               type="monotone"
               dataKey="total"
-              stroke={BCBS_COLORS[0]}
+              stroke={BRAND_COLORS[0]}
               strokeWidth={2.5}
-              dot={{ fill: BCBS_COLORS[0], r: 3 }}
-              activeDot={{ r: 5, fill: BCBS_COLORS[0] }}
+              dot={{ fill: BRAND_COLORS[0], r: 3 }}
+              activeDot={{ r: 5, fill: BRAND_COLORS[0] }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -392,7 +392,7 @@ export default function HealthSpendInsightsModule() {
           <button
             type="button"
             onClick={() => setShowAllInsights((prev) => !prev)}
-            className="text-sm font-medium text-bcbs-600 hover:text-bcbs-700 transition-colors"
+            className="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
           >
             {showAllInsights ? 'Show fewer insights' : `Show all ${insights.length} insights`}
           </button>

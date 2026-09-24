@@ -118,7 +118,7 @@ export default function AskMyClaimsModule() {
     <section className="space-y-5">
       {/* Header */}
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-bcbs-100 text-bcbs-600">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-100 text-brand-600">
           <Database className="h-5 w-5" />
         </div>
         <h2 className="text-lg font-bold text-gray-900">Ask My Claims</h2>
@@ -134,7 +134,7 @@ export default function AskMyClaimsModule() {
           className={cn(
             'w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3',
             'text-sm text-gray-800 placeholder:text-gray-400',
-            'focus:border-bcbs-400 focus:ring-2 focus:ring-bcbs-200 focus:outline-none',
+            'focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none',
             'transition-colors',
           )}
         />
@@ -142,8 +142,8 @@ export default function AskMyClaimsModule() {
           type="submit"
           disabled={!query.trim() || state === 'loading'}
           className={cn(
-            'rounded-lg bg-bcbs-600 px-5 py-2 text-sm font-semibold text-white',
-            'hover:bg-bcbs-700 transition-colors',
+            'rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white',
+            'hover:bg-brand-700 transition-colors',
             'disabled:opacity-50 disabled:cursor-not-allowed',
           )}
         >
@@ -160,9 +160,9 @@ export default function AskMyClaimsModule() {
             onClick={() => void runQuery(sq.query)}
             disabled={state === 'loading'}
             className={cn(
-              'shrink-0 rounded-full border border-bcbs-200 bg-bcbs-50 px-3 py-1.5',
-              'text-xs font-medium text-bcbs-700 whitespace-nowrap',
-              'hover:bg-bcbs-100 hover:border-bcbs-300 transition-colors',
+              'shrink-0 rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5',
+              'text-xs font-medium text-brand-700 whitespace-nowrap',
+              'hover:bg-brand-100 hover:border-brand-300 transition-colors',
               'disabled:opacity-50 disabled:cursor-not-allowed',
             )}
           >
@@ -174,7 +174,7 @@ export default function AskMyClaimsModule() {
       {/* Loading */}
       {state === 'loading' && (
         <div className="flex items-center gap-2 py-6 text-sm text-gray-500">
-          <Loader2 className="h-4 w-4 animate-spin text-bcbs-500" />
+          <Loader2 className="h-4 w-4 animate-spin text-brand-500" />
           Analyzing query...
         </div>
       )}

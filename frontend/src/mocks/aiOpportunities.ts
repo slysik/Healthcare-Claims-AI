@@ -242,7 +242,7 @@ export const SAMPLE_PLAN_QUESTIONS: PlanQuestion[] = [
 export const MOCK_PLAN_RESPONSES: Record<string, PlanResponse> = {
   'What is my annual deductible and how much have I met?': {
     answer:
-      'Your Blue Options Gold PPO plan has an individual annual deductible of $1,500 and a family deductible of $3,000. As of today, you have met $1,125.40 of your individual deductible (75%). Your remaining deductible is $374.60. Deductible resets on January 1 of each plan year.',
+      'Your Gold PPO plan has an individual annual deductible of $1,500 and a family deductible of $3,000. As of today, you have met $1,125.40 of your individual deductible (75%). Your remaining deductible is $374.60. Deductible resets on January 1 of each plan year.',
     citations: [
       { text: 'Individual Deductible: $1,500 per calendar year. Family Deductible: $3,000 per calendar year.', page: 12, section: 'Schedule of Benefits', relevance: 0.98 },
       { text: 'The deductible accumulation period begins January 1 and ends December 31 of each year.', page: 14, section: 'Deductible Provisions', relevance: 0.85 },
@@ -252,18 +252,18 @@ export const MOCK_PLAN_RESPONSES: Record<string, PlanResponse> = {
 
   'Does my plan cover telehealth visits?': {
     answer:
-      'Yes, your plan covers telehealth visits for medical and behavioral health services. Telehealth visits with in-network providers have a $25 copay, the same as a primary care office visit. Behavioral health telehealth visits have a $40 copay. No deductible applies to in-network telehealth visits. Covered platforms include BCBS Telehealth Connection, Teladoc, and MDLive.',
+      'Yes, your plan covers telehealth visits for medical and behavioral health services. Telehealth visits with in-network providers have a $25 copay, the same as a primary care office visit. Behavioral health telehealth visits have a $40 copay. No deductible applies to in-network telehealth visits. Covered platforms include Plan Telehealth Portal, Teladoc, and MDLive.',
     citations: [
       { text: 'Telehealth/Telemedicine Services: Covered at in-network cost sharing levels when delivered through an approved telehealth platform.', page: 28, section: 'Covered Medical Services', relevance: 0.97 },
       { text: 'Primary Care Visit (in-network, including telehealth): $25 copay, deductible waived.', page: 13, section: 'Schedule of Benefits', relevance: 0.93 },
-      { text: 'Approved Telehealth Platforms: BCBS Telehealth Connection, Teladoc, MDLive.', page: 29, section: 'Telehealth Provisions', relevance: 0.88 },
+      { text: 'Approved Telehealth Platforms: Plan Telehealth Portal, Teladoc, MDLive.', page: 29, section: 'Telehealth Provisions', relevance: 0.88 },
     ],
     confidence: 0.94,
   },
 
   'How do I appeal a denied claim?': {
     answer:
-      'You have the right to file an appeal within 180 days of receiving a denial notice. To start the process: (1) Review the Explanation of Benefits (EOB) for the specific denial reason code. (2) Submit a written appeal to BCBS Member Appeals at PO Box 100191, Columbia, SC 29202, or call 1-800-868-2528. (3) Include your member ID, claim number, and any supporting documentation from your provider. Internal appeals are typically resolved within 30 calendar days. If your internal appeal is denied, you may request an external review by an independent review organization within 4 months.',
+      'You have the right to file an appeal within 180 days of receiving a denial notice. To start the process: (1) Review the Explanation of Benefits (EOB) for the specific denial reason code. (2) Submit a written appeal to the plan Member Appeals at PO Box 100191, Columbia, SC 29202, or call 1-800-868-2528. (3) Include your member ID, claim number, and any supporting documentation from your provider. Internal appeals are typically resolved within 30 calendar days. If your internal appeal is denied, you may request an external review by an independent review organization within 4 months.',
     citations: [
       { text: 'Members may file an internal appeal within 180 calendar days from the date of the adverse benefit determination notice.', page: 62, section: 'Appeals & Grievances', relevance: 0.99 },
       { text: 'Internal appeals shall be resolved within 30 calendar days of receipt. Expedited appeals for urgent situations within 72 hours.', page: 63, section: 'Appeal Timeframes', relevance: 0.92 },
@@ -356,7 +356,7 @@ export const MOCK_WORKFLOWS: Workflow[] = [
       { id: 'appeal-1', label: 'Review EOB Denial Details', description: 'Locate the Explanation of Benefits for the denied claim and note the denial reason code (e.g., CO-197, CO-50).', estimatedTime: '5 min', status: 'pending' },
       { id: 'appeal-2', label: 'Gather Supporting Documentation', description: 'Collect medical records, provider letters of medical necessity, and any prior authorization references.', estimatedTime: '15 min', status: 'pending' },
       { id: 'appeal-3', label: 'Draft Appeal Letter', description: 'Write a formal appeal letter referencing your member ID, claim number, and specific plan provisions that support coverage.', estimatedTime: '20 min', status: 'pending' },
-      { id: 'appeal-4', label: 'Submit to BCBS Member Appeals', description: 'Mail to PO Box 100191, Columbia, SC 29202 or fax to 803-264-7200. Retain copies of all submitted materials.', estimatedTime: '10 min', status: 'pending' },
+      { id: 'appeal-4', label: 'Submit to Member Appeals', description: 'Mail or fax to the appeals address listed on your EOB. Retain copies of all submitted materials.', estimatedTime: '10 min', status: 'pending' },
       { id: 'appeal-5', label: 'Track Appeal Status', description: 'Monitor appeal status via the member portal or call 1-800-868-2528. Internal appeals are resolved within 30 calendar days.', estimatedTime: 'Ongoing', status: 'pending' },
     ],
   },
@@ -366,9 +366,9 @@ export const MOCK_WORKFLOWS: Workflow[] = [
     description: 'Research and compare cost estimates across in-network providers for a planned procedure.',
     steps: [
       { id: 'cost-1', label: 'Identify Procedure Codes', description: 'Obtain the CPT code(s) for your planned procedure from your referring provider (e.g., CPT 27447 for knee replacement).', estimatedTime: '5 min', status: 'pending' },
-      { id: 'cost-2', label: 'Search In-Network Providers', description: 'Use the BCBS Find a Provider tool to locate in-network facilities and specialists for your procedure.', estimatedTime: '10 min', status: 'pending' },
-      { id: 'cost-3', label: 'Request Cost Estimates', description: 'Call BCBS at 1-800-868-2528 or use the Cost Estimator tool to get member-specific cost estimates for each provider.', estimatedTime: '15 min', status: 'pending' },
-      { id: 'cost-4', label: 'Compare Quality Ratings', description: 'Review provider quality scores, patient satisfaction ratings, and complication rates on the BCBS Quality Care portal.', estimatedTime: '10 min', status: 'pending' },
+      { id: 'cost-2', label: 'Search In-Network Providers', description: 'Use the plan’s Find a Provider tool to locate in-network facilities and specialists for your procedure.', estimatedTime: '10 min', status: 'pending' },
+      { id: 'cost-3', label: 'Request Cost Estimates', description: 'Call Member Services or use the Cost Estimator tool to get member-specific cost estimates for each provider.', estimatedTime: '15 min', status: 'pending' },
+      { id: 'cost-4', label: 'Compare Quality Ratings', description: 'Review provider quality scores, patient satisfaction ratings, and complication rates on the plan’s quality ratings portal.', estimatedTime: '10 min', status: 'pending' },
       { id: 'cost-5', label: 'Select Provider & Schedule', description: 'Choose the provider with the best cost-quality balance and contact their scheduling office to set an appointment.', estimatedTime: '10 min', status: 'pending' },
     ],
   },
@@ -379,21 +379,21 @@ export const MOCK_WORKFLOWS: Workflow[] = [
     steps: [
       { id: 'benefits-1', label: 'Identify Service Details', description: 'Gather the service description, CPT/HCPCS codes, and diagnosis codes (ICD-10) from your provider.', estimatedTime: '5 min', status: 'pending' },
       { id: 'benefits-2', label: 'Check Schedule of Benefits', description: 'Review your plan\'s Schedule of Benefits in the member portal for coverage details, copays, and exclusions.', estimatedTime: '10 min', status: 'pending' },
-      { id: 'benefits-3', label: 'Verify Prior Auth Requirements', description: 'Check if the service requires prior authorization by calling BCBS Utilization Management at 1-800-868-2528.', estimatedTime: '10 min', status: 'pending' },
+      { id: 'benefits-3', label: 'Verify Prior Auth Requirements', description: 'Check if the service requires prior authorization by calling Utilization Management at 1-800-868-2528.', estimatedTime: '10 min', status: 'pending' },
       { id: 'benefits-4', label: 'Confirm Network Status', description: 'Verify the provider is in-network for the specific service. Some providers may be in-network for office visits but out-of-network for certain procedures.', estimatedTime: '5 min', status: 'pending' },
     ],
   },
   {
     id: 'wf-prior-auth',
     title: 'Request Prior Authorization',
-    description: 'Obtain advance approval from BCBS before receiving a service that requires prior authorization.',
+    description: 'Obtain advance approval from the plan before receiving a service that requires prior authorization.',
     steps: [
       { id: 'auth-1', label: 'Confirm PA Requirement', description: 'Verify the service requires prior authorization by checking the PA Required Services list on the member portal or calling Member Services.', estimatedTime: '5 min', status: 'pending' },
-      { id: 'auth-2', label: 'Provider Submits PA Request', description: 'Your provider submits the prior authorization request to BCBS with clinical documentation, diagnosis codes, and treatment rationale.', estimatedTime: '15 min', status: 'pending' },
-      { id: 'auth-3', label: 'BCBS Medical Review', description: 'BCBS clinical team reviews the request against medical policy criteria. Standard reviews take up to 15 calendar days; urgent reviews within 72 hours.', estimatedTime: '1-15 days', status: 'pending' },
-      { id: 'auth-4', label: 'Receive Determination', description: 'BCBS sends the authorization decision to both you and your provider. If approved, note the authorization number and validity period.', estimatedTime: '1-3 days', status: 'pending' },
+      { id: 'auth-2', label: 'Provider Submits PA Request', description: 'Your provider submits the prior authorization request to the plan with clinical documentation, diagnosis codes, and treatment rationale.', estimatedTime: '15 min', status: 'pending' },
+      { id: 'auth-3', label: 'Plan Medical Review', description: 'The plan\'s clinical team reviews the request against medical policy criteria. Standard reviews take up to 15 calendar days; urgent reviews within 72 hours.', estimatedTime: '1-15 days', status: 'pending' },
+      { id: 'auth-4', label: 'Receive Determination', description: 'The plan sends the authorization decision to both you and your provider. If approved, note the authorization number and validity period.', estimatedTime: '1-3 days', status: 'pending' },
       { id: 'auth-5', label: 'Schedule Service', description: 'Once approved, schedule your procedure within the authorization validity window (typically 60-90 days).', estimatedTime: '10 min', status: 'pending' },
-      { id: 'auth-6', label: 'Appeal if Denied', description: 'If denied, you may file an appeal within 180 days. Request a peer-to-peer review between your provider and BCBS medical director.', estimatedTime: '30 min', status: 'pending' },
+      { id: 'auth-6', label: 'Appeal if Denied', description: 'If denied, you may file an appeal within 180 days. Request a peer-to-peer review between your provider and the plan medical director.', estimatedTime: '30 min', status: 'pending' },
     ],
   },
 ]
@@ -422,7 +422,7 @@ export const MOCK_RECOMMENDATIONS: Recommendation[] = [
   {
     id: 'rec-mail-order',
     title: 'Use Mail-Order Pharmacy for Maintenance Meds',
-    description: 'Switch your 3 maintenance medications to 90-day mail order and save up to 30%. BCBS partners with Express Scripts for home delivery.',
+    description: 'Switch your 3 maintenance medications to 90-day mail order and save up to 30%. The plan offers a mail-order pharmacy for home delivery.',
     priority: 'medium',
     category: 'Pharmacy Savings',
     actionLabel: 'Set Up Mail Order',

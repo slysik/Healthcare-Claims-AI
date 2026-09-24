@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Generate BCBS Benefits Summary PDF using fpdf2.
-Creates a professional 10-page benefits document for BlueCross BlueShield of South Carolina.
+Generate Sample Health Plan Benefits Summary PDF using fpdf2.
+Creates a professional 10-page benefits document for Sample Health Plan (fictional).
 """
 
 # /// script
@@ -13,32 +13,32 @@ from fpdf import FPDF
 from pathlib import Path
 
 class BCSBBenefitsPDF(FPDF):
-    """Custom PDF class for BCBS benefits document with headers and footers."""
+    """Custom PDF class for the sample benefits document with headers and footers."""
 
     def __init__(self):
         super().__init__(orientation="P", unit="mm", format="A4")
         self.page_num = 0
-        self.bcbs_blue = (0, 87, 184)  # #0057B8
+        self.brand_blue = (0, 87, 184)  # #0057B8
         self.dark_gray = (80, 80, 80)
         self.light_gray = (240, 240, 240)
 
     def header(self):
-        """Add header with BCBS branding to each page."""
+        """Add header with sample-plan branding to each page."""
         if self.page_num == 1:
             # Title page - special header
             self.set_font("Helvetica", "B", 24)
-            self.set_text_color(*self.bcbs_blue)
-            self.cell(0, 20, "BCBS Benefits Summary", ln=True, align="C")
+            self.set_text_color(*self.brand_blue)
+            self.cell(0, 20, "Sample Health Plan Benefits Summary", ln=True, align="C")
             self.set_font("Helvetica", "", 12)
             self.set_text_color(80, 80, 80)
-            self.cell(0, 10, "BlueCross BlueShield of South Carolina", ln=True, align="C")
+            self.cell(0, 10, "Sample Health Plan (fictional)", ln=True, align="C")
             self.cell(0, 10, "Effective January 1, 2025", ln=True, align="C")
             self.ln(5)
         else:
             # Regular pages - simple header
             self.set_font("Helvetica", "B", 10)
-            self.set_text_color(*self.bcbs_blue)
-            self.cell(0, 8, "BlueCross BlueShield of South Carolina - Benefits Summary", ln=True)
+            self.set_text_color(*self.brand_blue)
+            self.cell(0, 8, "Sample Health Plan (fictional) - Benefits Summary", ln=True)
             self.set_draw_color(0, 87, 184)
             self.line(10, self.get_y(), 200, self.get_y())
             self.ln(2)
@@ -54,7 +54,7 @@ class BCSBBenefitsPDF(FPDF):
     def section_header(self, title):
         """Add a section header with blue background."""
         self.set_font("Helvetica", "B", 14)
-        self.set_fill_color(*self.bcbs_blue)
+        self.set_fill_color(*self.brand_blue)
         self.set_text_color(255, 255, 255)
         self.cell(0, 10, title, ln=True, fill=True)
         self.set_text_color(0, 0, 0)
@@ -63,7 +63,7 @@ class BCSBBenefitsPDF(FPDF):
     def subsection_header(self, title):
         """Add a subsection header."""
         self.set_font("Helvetica", "B", 11)
-        self.set_text_color(*self.bcbs_blue)
+        self.set_text_color(*self.brand_blue)
         self.cell(0, 8, title, ln=True)
         self.set_text_color(0, 0, 0)
         self.ln(1)
@@ -80,7 +80,7 @@ class BCSBBenefitsPDF(FPDF):
 
         # Table header
         self.set_font("Helvetica", "B", 9)
-        self.set_fill_color(*self.bcbs_blue)
+        self.set_fill_color(*self.brand_blue)
         self.set_text_color(255, 255, 255)
 
         col_widths = [70, 40, 40, 40]
@@ -110,7 +110,7 @@ class BCSBBenefitsPDF(FPDF):
         self.ln(2)
 
 def generate_pdf():
-    """Generate the complete BCBS benefits PDF."""
+    """Generate the complete sample benefits PDF."""
     pdf = BCSBBenefitsPDF()
     pdf.add_page()
     pdf.page_num = 1
@@ -126,7 +126,7 @@ def generate_pdf():
 
     pdf.ln(5)
     pdf.set_font("Helvetica", "B", 12)
-    pdf.set_text_color(*pdf.bcbs_blue)
+    pdf.set_text_color(*pdf.brand_blue)
     pdf.cell(0, 10, "Table of Contents", ln=True)
 
     pdf.set_font("Helvetica", "", 10)
@@ -153,11 +153,11 @@ def generate_pdf():
     pdf.section_header("Plan Overview")
 
     pdf.body_text(
-        "BlueCross BlueShield of South Carolina offers three comprehensive health plan options "
+        "Sample Health Plan (fictional) offers three comprehensive health plan options "
         "to meet the diverse healthcare needs of our members. Each plan is designed to provide "
         "excellent coverage with varying levels of cost-sharing and out-of-pocket expenses. "
         "All plans are effective January 1, 2025, and provide access to our extensive network "
-        "of healthcare providers throughout South Carolina and nationally."
+        "of healthcare providers regionally and nationally."
     )
 
     # Plan descriptions
@@ -242,10 +242,10 @@ def generate_pdf():
     pdf.set_text_color(0, 0, 0)
     pdf.ln(2)
     pdf.body_text(
-        "In-Network: Using providers that have contracted with BlueCross BlueShield to provide "
+        "In-Network: Using providers that have contracted with Sample Health Plan to provide "
         "services at negotiated rates. In-network care always has lower out-of-pocket costs and "
         "higher coverage percentages. Out-of-Network: Using providers that do not have a contract "
-        "with BlueCross BlueShield. Out-of-network care generally costs more and is subject to "
+        "with Sample Health Plan. Out-of-network care generally costs more and is subject to "
         "higher deductibles and coinsurance percentages. Emergency services are covered at the "
         "in-network rate regardless of whether the provider is in-network."
     )
@@ -315,7 +315,7 @@ def generate_pdf():
     pdf.section_header("Covered Services")
 
     pdf.body_text(
-        "BlueCross BlueShield covers a comprehensive range of healthcare services. This section "
+        "Sample Health Plan covers a comprehensive range of healthcare services. This section "
         "outlines the major categories of covered services under all three plan options. Unless "
         "otherwise noted, services are covered at the percentages and with the copays described "
         "in the previous section. All covered services must be provided by a licensed healthcare "
@@ -404,7 +404,7 @@ def generate_pdf():
     )
 
     pdf.body_text(
-        "Virtual care is available through the BCBS Virtual Care app and approved providers. Services "
+        "Virtual care is available through the plan's Virtual Care app and approved providers. Services "
         "covered via telehealth include: Primary care and general medical consultations, Specialist "
         "consultations for ongoing conditions, Prescription refills and medication adjustments, "
         "Behavioral health and mental health counseling, Substance abuse treatment consultations, "
@@ -417,7 +417,7 @@ def generate_pdf():
     pdf.section_header("Prescription Drug Coverage")
 
     pdf.body_text(
-        "BlueCross BlueShield maintains a comprehensive formulary of covered medications organized by tier. "
+        "Sample Health Plan maintains a comprehensive formulary of covered medications organized by tier. "
         "All medications are covered when prescribed by an in-network provider and filled at an in-network "
         "pharmacy. The copay or coinsurance amount depends on the medication tier and your plan type. "
         "Prior authorization may be required for certain medications as noted below."
@@ -460,7 +460,7 @@ def generate_pdf():
 
     pdf.body_text(
         "Prior authorization is a utilization review process that helps ensure medical services are "
-        "medically necessary and appropriate. BlueCross BlueShield requires prior authorization for "
+        "medically necessary and appropriate. Sample Health Plan requires prior authorization for "
         "certain services to control costs while maintaining access to appropriate care. Your healthcare "
         "provider can request prior authorization, and most requests are approved or denied within one "
         "business day. Emergency services bypass the prior authorization process."
@@ -487,7 +487,7 @@ def generate_pdf():
     pdf.body_text(
         "If your health condition requires urgent care, you may request expedited prior authorization. "
         "Expedited requests are reviewed and approved or denied within 24 hours. Request expedited "
-        "authorization by contacting BlueCross BlueShield directly or asking your healthcare provider "
+        "authorization by contacting Sample Health Plan directly or asking your healthcare provider "
         "to mark the request as urgent. In life-threatening situations, emergency care does not require "
         "prior authorization."
     )
@@ -496,7 +496,7 @@ def generate_pdf():
     pdf.section_header("Mental Health and Substance Abuse Coverage")
 
     pdf.body_text(
-        "BlueCross BlueShield is committed to providing comprehensive mental health and substance abuse "
+        "Sample Health Plan is committed to providing comprehensive mental health and substance abuse "
         "treatment coverage as part of our commitment to whole-person health. Mental health services "
         "are covered at the same level as physical health services, with no separate annual limits on "
         "the number of visits for outpatient care. Substance abuse treatment is fully covered for both "
@@ -525,7 +525,7 @@ def generate_pdf():
 
     pdf.subsection_header("Employee Assistance Program (EAP)")
     pdf.body_text(
-        "All employees have access to the BlueCross BlueShield Employee Assistance Program, which provides "
+        "All employees have access to the Sample Health Plan Employee Assistance Program, which provides "
         "6 free confidential counseling sessions per year for you and your family members. EAP services include "
         "counseling for stress, work-related issues, family problems, substance abuse concerns, and mental health "
         "challenges. EAP services are completely separate from your medical benefits and are confidential. Call "
@@ -534,7 +534,7 @@ def generate_pdf():
 
     pdf.subsection_header("Crisis Support Services")
     pdf.body_text(
-        "BlueCross BlueShield operates a 24/7 mental health crisis hotline for members in immediate crisis or "
+        "Sample Health Plan operates a 24/7 mental health crisis hotline for members in immediate crisis or "
         "considering suicide. Crisis hotline staff can help you access emergency mental health services, locate "
         "crisis treatment facilities, and provide immediate support. All crisis calls are confidential and free "
         "of charge. If you or someone you know is in immediate danger, always call 911 or go to the nearest "
@@ -547,7 +547,7 @@ def generate_pdf():
     pdf.section_header("Emergency and Urgent Care")
 
     pdf.body_text(
-        "BlueCross BlueShield provides comprehensive coverage for emergency and urgent healthcare services. "
+        "Sample Health Plan provides comprehensive coverage for emergency and urgent healthcare services. "
         "Emergency services are covered regardless of whether you are treated by an in-network or out-of-network "
         "provider. Emergency room copays are waived if you are admitted to the hospital, ensuring that financial "
         "barriers do not prevent you from seeking necessary emergency care."
@@ -595,9 +595,9 @@ def generate_pdf():
     pdf.section_header("Exclusions and Limitations")
 
     pdf.body_text(
-        "While BlueCross BlueShield provides comprehensive health coverage, certain services and treatments are not covered. "
+        "While Sample Health Plan provides comprehensive health coverage, certain services and treatments are not covered. "
         "This section outlines the major exclusions and limitations that apply to all plans. Some exclusions may be subject "
-        "to exceptions with prior authorization or medical review. Contact BlueCross BlueShield customer service for information "
+        "to exceptions with prior authorization or medical review. Contact Sample Health Plan customer service for information "
         "about specific services or treatments."
     )
 
@@ -612,7 +612,7 @@ def generate_pdf():
 
     pdf.subsection_header("Experimental and Investigational Treatments")
     pdf.body_text(
-        "Experimental, investigational, or unproven treatments are not covered unless approved through BlueCross BlueShield's "
+        "Experimental, investigational, or unproven treatments are not covered unless approved through Sample Health Plan's "
         "experimental treatment review process. Coverage of experimental treatments requires evidence that the treatment shows "
         "promise for your specific condition and is being conducted through a clinical trial or formal research program. Request "
         "an experimental treatment review by submitting clinical evidence and information about the proposed treatment."
@@ -629,7 +629,7 @@ def generate_pdf():
     pdf.body_text(
         "No health services are covered before your plan effective date. Your coverage begins at 12:01 a.m. on January 1, 2025. "
         "Services received before this date are not covered under this plan, even if the provider submits claims after your coverage "
-        "begins. If you have questions about your coverage effective date, contact BlueCross BlueShield."
+        "begins. If you have questions about your coverage effective date, contact Sample Health Plan."
     )
 
     pdf.subsection_header("Weight Loss Surgery")
@@ -665,7 +665,7 @@ def generate_pdf():
 
     pdf.subsection_header("How to Use Your Benefits")
     pdf.body_text(
-        "To maximize your benefits, always inform your healthcare provider that you are covered by BlueCross BlueShield. "
+        "To maximize your benefits, always inform your healthcare provider that you are covered by Sample Health Plan. "
         "For PPO plans, you may choose any healthcare provider without prior authorization for office visits. For HMO plans, "
         "select a primary care physician who will coordinate your care and provide referrals to specialists. For HDHP plans, "
         "you have flexibility similar to PPO plans but should be mindful of the higher deductible. Keep your member ID card "
@@ -674,25 +674,25 @@ def generate_pdf():
 
     pdf.subsection_header("Finding In-Network Providers")
     pdf.body_text(
-        "Search for in-network healthcare providers using the BlueCross BlueShield online provider directory at www.bcbs-sc.com. "
+        "Search for in-network healthcare providers using the Sample Health Plan online provider directory at www.example-healthplan.org. "
         "The directory includes primary care physicians, specialists, hospitals, urgent care centers, and other healthcare facilities. "
         "You can search by location, specialty, language, and other preferences. If you cannot find an in-network provider for a "
-        "specific service, contact BlueCross BlueShield to request an out-of-network referral."
+        "specific service, contact Sample Health Plan to request an out-of-network referral."
     )
 
     pdf.subsection_header("Member Services Contact Information")
     pdf.body_text(
-        "For questions about your coverage, claims, or provider information, contact BlueCross BlueShield Member Services:\n\n"
-        "Phone: 1-800-BCBS-SC (1-800-222-7772)\n"
+        "For questions about your coverage, claims, or provider information, contact Sample Health Plan Member Services:\n\n"
+        "Phone: 1-800-555-0100 (fictional)\n"
         "Hours: Monday-Friday 8:00 AM - 8:00 PM, Saturday 9:00 AM - 5:00 PM (Eastern Time)\n"
-        "Website: www.bcbs-sc.com\n"
-        "Mobile App: BlueCross BlueShield of SC app (available on iOS and Android)\n"
-        "TTY/TDD: 1-800-735-2966"
+        "Website: www.example-healthplan.org\n"
+        "Mobile App: Sample Health Plan app (available on iOS and Android)\n"
+        "TTY/TDD: 1-800-555-0101 (fictional)"
     )
 
     pdf.subsection_header("Claims and Billing")
     pdf.body_text(
-        "Claims for in-network services are typically submitted directly to BlueCross BlueShield by your healthcare provider. "
+        "Claims for in-network services are typically submitted directly to Sample Health Plan by your healthcare provider. "
         "You will receive an explanation of benefits (EOB) detailing the services, amounts charged, your responsibility, and what "
         "the plan paid. For out-of-network services, you may need to submit claims yourself. Keep copies of receipts and documentation. "
         "Questions about claims should be directed to Member Services using the contact information above."
@@ -700,14 +700,14 @@ def generate_pdf():
 
     pdf.subsection_header("Coordination of Benefits")
     pdf.body_text(
-        "If you have coverage from another health plan (such as a spouse's employer plan), BlueCross BlueShield will coordinate "
+        "If you have coverage from another health plan (such as a spouse's employer plan), Sample Health Plan will coordinate "
         "benefits to ensure you are not overpaid. The plan that pays first is determined by the coordination of benefits rules. "
-        "Notify BlueCross BlueShield of any additional coverage so your claims can be processed correctly."
+        "Notify Sample Health Plan of any additional coverage so your claims can be processed correctly."
     )
 
     pdf.subsection_header("Plan Changes and Termination")
     pdf.body_text(
-        "This benefits summary describes your coverage effective January 1, 2025. BlueCross BlueShield reserves the right to modify "
+        "This benefits summary describes your coverage effective January 1, 2025. Sample Health Plan reserves the right to modify "
         "plan benefits, copays, deductibles, and covered services prospectively. You will receive advance notice of material changes. "
         "If your employment terminates or you become ineligible for coverage, you may be entitled to continuation coverage under COBRA "
         "for up to 18 months. Contact your employer's benefits administrator for COBRA information."
@@ -716,20 +716,20 @@ def generate_pdf():
     pdf.subsection_header("Grievances and Appeals")
     pdf.body_text(
         "If you believe a claim was wrongly denied or if you have concerns about the care you received, you have the right to file "
-        "a grievance or appeal. All grievances and appeals are reviewed by BlueCross BlueShield and you will receive a decision within "
-        "30 days. For complaints regarding the quality of care, contact the South Carolina Department of Insurance at 1-800-869-2876."
+        "a grievance or appeal. All grievances and appeals are reviewed by Sample Health Plan and you will receive a decision within "
+        "30 days. For complaints regarding the quality of care, contact your state Department of Insurance."
     )
 
     pdf.subsection_header("Notice of Privacy Practices")
     pdf.body_text(
-        "BlueCross BlueShield is required by HIPAA to maintain the privacy of your health information and to provide you with a Notice "
+        "Sample Health Plan is required by HIPAA to maintain the privacy of your health information and to provide you with a Notice "
         "of Privacy Practices. The notice describes how we use and disclose your health information, your rights regarding your information, "
         "and how to contact us with privacy concerns. You can request a copy of the privacy notice from Member Services or download it from "
-        "www.bcbs-sc.com."
+        "www.example-healthplan.org."
     )
 
     # Save the PDF
-    output_path = "/Users/slysik/bcbs/data/bcbs_benefits_summary.pdf"
+    output_path = str(Path(__file__).resolve().parent / "sample_benefits_summary.pdf")
     pdf.output(output_path)
     print(f"PDF generated successfully: {output_path}")
     print(f"Total pages: {pdf.page_num}")

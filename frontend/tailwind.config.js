@@ -12,7 +12,7 @@ export default {
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        bcbs: {
+        brand: {
           50:  '#EFF6FF',
           100: '#DBEAFE',
           200: '#BFDBFE',

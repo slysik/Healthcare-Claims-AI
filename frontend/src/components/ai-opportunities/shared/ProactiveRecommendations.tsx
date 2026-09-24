@@ -30,7 +30,7 @@ export default function ProactiveRecommendations({ recommendations }: ProactiveR
       <div className="flex items-center gap-2">
         <Lightbulb className="h-4 w-4 text-amber-500" />
         <h3 className="text-sm font-semibold text-gray-900">Recommendations for You</h3>
-        <span className="rounded-full bg-bcbs-100 px-2 py-0.5 text-[10px] font-semibold text-bcbs-700">
+        <span className="rounded-full bg-brand-100 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
           {recommendations.length}
         </span>
       </div>
@@ -44,11 +44,11 @@ export default function ProactiveRecommendations({ recommendations }: ProactiveR
               key={rec.id}
               className={cn(
                 'flex-shrink-0 w-72 snap-start',
-                'rounded-lg border border-bcbs-100 bg-white',
+                'rounded-lg border border-brand-100 bg-white',
                 'border-l-4',
                 style.border,
                 'p-4 space-y-2.5',
-                'hover:shadow-md hover:shadow-bcbs-100/40 transition-shadow duration-200',
+                'hover:shadow-md hover:shadow-brand-100/40 transition-shadow duration-200',
               )}
             >
               {/* Top row: category + priority */}
@@ -74,8 +74,8 @@ export default function ProactiveRecommendations({ recommendations }: ProactiveR
               <button
                 type="button"
                 className={cn(
-                  'mt-auto inline-flex items-center gap-1 text-xs font-semibold text-bcbs-600',
-                  'hover:text-bcbs-500 transition-colors',
+                  'mt-auto inline-flex items-center gap-1 text-xs font-semibold text-brand-600',
+                  'hover:text-brand-500 transition-colors',
                 )}
               >
                 {rec.actionLabel}

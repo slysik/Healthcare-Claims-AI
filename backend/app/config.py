@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_REGION: str = "us-east-1"
     S3_BUCKET: str = ""
-    DYNAMODB_TABLE: str = "bcbs-conversations"
+    DYNAMODB_TABLE: str = "claims-ai-conversations"
 
     # Paths
     DATA_DIR: str = "../data"

@@ -16,12 +16,12 @@ export default function SqlViewer({ sql }: Props) {
   }
 
   return (
-    <div className="ring-1 ring-bcbs-100 rounded-xl overflow-hidden shadow-sm">
-      <div className="w-full flex items-center justify-between px-3 py-2 bg-bcbs-50 text-sm">
+    <div className="ring-1 ring-brand-100 rounded-xl overflow-hidden shadow-sm">
+      <div className="w-full flex items-center justify-between px-3 py-2 bg-brand-50 text-sm">
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 text-bcbs-600 hover:text-bcbs-700 transition-all duration-200"
+          className="flex items-center gap-2 text-brand-600 hover:text-brand-700 transition-all duration-200"
           aria-expanded={isOpen}
           aria-controls="sql-viewer-content"
         >
@@ -36,7 +36,7 @@ export default function SqlViewer({ sql }: Props) {
           <button
             type="button"
             onClick={handleCopy}
-            className="flex items-center gap-1 text-xs text-bcbs-400 hover:text-bcbs-600"
+            className="flex items-center gap-1 text-xs text-brand-400 hover:text-brand-600"
             aria-label="Copy SQL query"
           >
             {copied ? (

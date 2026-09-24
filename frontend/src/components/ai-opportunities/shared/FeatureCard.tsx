@@ -29,18 +29,18 @@ export default function FeatureCard({
       className={cn(
         'group relative flex flex-col items-start gap-3 rounded-xl border p-5 text-left',
         'transition-all duration-200',
-        'hover:-translate-y-0.5 hover:shadow-lg hover:shadow-bcbs-100/60',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bcbs-400 focus-visible:ring-offset-2',
+        'hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-100/60',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2',
         isActive
-          ? 'border-bcbs-500 bg-bcbs-50/80 shadow-md shadow-bcbs-100/40'
-          : 'border-bcbs-100 bg-white hover:border-bcbs-300',
+          ? 'border-brand-500 bg-brand-50/80 shadow-md shadow-brand-100/40'
+          : 'border-brand-100 bg-white hover:border-brand-300',
       )}
     >
       {/* Icon */}
       <div
         className={cn(
           'flex h-10 w-10 items-center justify-center rounded-lg',
-          isActive ? 'bg-bcbs-500 text-white' : 'bg-bcbs-50 text-bcbs-500 group-hover:bg-bcbs-100',
+          isActive ? 'bg-brand-500 text-white' : 'bg-brand-50 text-brand-500 group-hover:bg-brand-100',
         )}
       >
         <Icon className="h-5 w-5" />
@@ -65,7 +65,7 @@ export default function FeatureCard({
           aria-describedby={showTooltip ? tooltipId : undefined}
           className={cn(
             'inline-block rounded-full px-2.5 py-0.5 text-[10px] font-semibold',
-            isActive ? 'bg-bcbs-500/10 text-bcbs-700' : 'bg-gray-100 text-gray-600',
+            isActive ? 'bg-brand-500/10 text-brand-700' : 'bg-gray-100 text-gray-600',
           )}
         >
           {businessValue}
